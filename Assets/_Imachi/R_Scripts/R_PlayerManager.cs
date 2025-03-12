@@ -1,92 +1,92 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class R_PlayerManager : MonoBehaviour
 {
-	#region ƒVƒ“ƒOƒ‹ƒgƒ“
+	#region ã‚·ãƒ³ã‚°ãƒ«ãƒˆãƒ³
 	static R_PlayerManager instance;
 
-    public R_PlayerManager Instance
+	public R_PlayerManager Instance
 	{
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<R_PlayerManager>();
+		get
+		{
+			if (instance == null)
+			{
+				instance = FindObjectOfType<R_PlayerManager>();
 			}
 
-            return instance;
-        }
+			return instance;
+		}
 
-    }
+	}
 
-    public void Awake()
-    {
-        //ƒCƒ“ƒXƒ^ƒ“ƒX‚ªŠù‚É‘¶İ‚µ‚Ä‚¢‚½‚ç©g‚ğÁ‹‚·‚é
-        if (this != Instance)
-        {
-            Destroy(gameObject);
-            return;
-        }
-    }
+	public void Awake()
+	{
+		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒæ—¢ã«å­˜åœ¨ã—ã¦ã„ãŸã‚‰è‡ªèº«ã‚’æ¶ˆå»ã™ã‚‹
+		if (this != Instance)
+		{
+			Destroy(gameObject);
+			return;
+		}
+	}
 	#endregion
 
 
-    #region •Ï”
+	#region å¤‰æ•°
 
-	//ƒvƒŒƒCƒ„[©g
-	[SerializeField,Header("ˆÚ“®‘¬“x")] float _moveSpeed = 2.0f;
-	[SerializeField,Header("‰ñ“]‘¬“x")] float _rotSpeed = 1.0f;
-    Transform _transform;       //ƒLƒƒƒbƒVƒ…—p
-    float _time;                //ƒfƒ‹ƒ^ƒ^ƒCƒ€Ši”[—p
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è‡ªèº«
+	[SerializeField, Header("ç§»å‹•é€Ÿåº¦")] float _moveSpeed = 2.0f;
+	[SerializeField, Header("å›è»¢é€Ÿåº¦")] float _rotSpeed = 1.0f;
+	Transform _transform;       //ã‚­ãƒ£ãƒƒã‚·ãƒ¥ç”¨
+	float _time;                //ãƒ‡ãƒ«ã‚¿ã‚¿ã‚¤ãƒ æ ¼ç´ç”¨
 
-    //’e
-    [SerializeField, Header("’e”­Ë‘¬“x")] float _bulletSpeed;
+	//å¼¾
+	[SerializeField, Header("å¼¾ç™ºå°„é€Ÿåº¦")] float _bulletSpeed;
 
-    //HP
-    [SerializeField, Header("‘Ì—Í")] float _HP;
+	//HP
+	[SerializeField, Header("ä½“åŠ›")] float _HP;
 	#endregion
 
 
 
 	void Start()
-    {
-        _transform = transform;
-        _time = Time.deltaTime;
-    }
-
-
-    void Update()
-    {
-        _PlayerMove();
-    }
-
-
-
-    /// <summary>
-    /// ƒvƒŒƒCƒ„[‚ÌˆÚ“®ˆ—
-    /// </summary>
-    void _PlayerMove()
 	{
-        //³–ÊˆÚ“®
-        if (Input.GetKey(KeyCode.W))
-        {
-        }
+		_transform = transform;
+		_time = Time.deltaTime;
+	}
 
-        //¶ˆÚ“®
-        if (Input.GetKey(KeyCode.A))
-        {
-        }
 
-        //‰EˆÚ“®
-        if (Input.GetKey(KeyCode.D))
-        {
-        }
+	void Update()
+	{
+		_PlayerMove();
+	}
 
-        //Œã‚ëˆÚ“®
-        if (Input.GetKey(KeyCode.S))
-        {
-        }
-    }
+
+
+	/// <summary>
+	/// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•å‡¦ç†
+	/// </summary>
+	void _PlayerMove()
+	{
+		//æ­£é¢ç§»å‹•
+		if (Input.GetKey(KeyCode.W))
+		{
+		}
+
+		//å·¦ç§»å‹•
+		if (Input.GetKey(KeyCode.A))
+		{
+		}
+
+		//å³ç§»å‹•
+		if (Input.GetKey(KeyCode.D))
+		{
+		}
+
+		//å¾Œã‚ç§»å‹•
+		if (Input.GetKey(KeyCode.S))
+		{
+		}
+	}
 }
