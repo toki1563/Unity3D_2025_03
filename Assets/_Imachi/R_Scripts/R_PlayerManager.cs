@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
+/// <summary>
+/// プレイヤーを管理するクラス
+/// </summary>
 public class R_PlayerManager : MonoBehaviour
 {
 	#region シングルトン
@@ -18,7 +22,6 @@ public class R_PlayerManager : MonoBehaviour
 
 			return instance;
 		}
-
 	}
 
 	public void Awake()
@@ -35,17 +38,25 @@ public class R_PlayerManager : MonoBehaviour
 
 	#region 変数
 
-	//プレイヤー自身
-	[SerializeField, Header("移動速度")] float _moveSpeed = 2.0f;
-	[SerializeField, Header("回転速度")] float _rotSpeed = 1.0f;
+	//パラメーター
+	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed = 2.0f;
+	[SerializeField, Header("プレイヤーのHP")] float _HP;
+	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] float _bulletSpeed;
+
+	float _speed​​Compensation;	//速度補正
+	Vector3 _moveDir;			//移動方向
 	Transform _transform;       //キャッシュ用
 	float _time;                //デルタタイム格納用
 
-	//弾
-	[SerializeField, Header("弾発射速度")] float _bulletSpeed;
 
-	//HP
-	[SerializeField, Header("体力")] float _HP;
+	enum ACTION
+	{
+		ATTACK,
+		DEFENCE,
+		RELOAD
+	}
+
+	ACTION _actionType;
 	#endregion
 
 
@@ -59,6 +70,25 @@ public class R_PlayerManager : MonoBehaviour
 
 	void Update()
 	{
+
+		//移動速度補正
+		switch (_actionType)
+		{
+			case ACTION.ATTACK:
+				_speed​​Compensation = 0.5f;
+				break;
+			case ACTION.DEFENCE:
+				_speed​​Compensation = 0.25f;
+				break;
+			case ACTION.RELOAD:
+				_speed​​Compensation = 0.5f;
+				break;
+			default://通常時
+				_speed​​Compensation = 1.0f;
+				break;
+		}
+
+
 		_PlayerMove();
 	}
 
@@ -69,24 +99,33 @@ public class R_PlayerManager : MonoBehaviour
 	/// </summary>
 	void _PlayerMove()
 	{
-		//正面移動
-		if (Input.GetKey(KeyCode.W))
-		{
-		}
+		//何も入力が無い場合は方向初期化
+		_moveDir = Vector3.zero;
 
-		//左移動
-		if (Input.GetKey(KeyCode.A))
-		{
-		}
+		//正面方向へ加算
+		if (Input.GetKey(KeyCode.W)) _moveDir += Vector3.forward;
 
-		//右移動
-		if (Input.GetKey(KeyCode.D))
-		{
-		}
+		//左方向へ加算
+		if (Input.GetKey(KeyCode.A)) _moveDir += Vector3.left;
 
-		//後ろ移動
-		if (Input.GetKey(KeyCode.S))
+		//右方向へ加算
+		if (Input.GetKey(KeyCode.D)) _moveDir += Vector3.right;
+
+		//後ろ方向へ加算
+		if (Input.GetKey(KeyCode.S)) _moveDir += Vector3.back;
+
+
+		//移動キーが押されていた場合
+		if (_moveDir != Vector3.zero)
 		{
+			//移動の正規化
+			_moveDir = _moveDir.normalized; 
+
+			//移動処理
+			_transform.position += _moveDir * _moveSpeed * _speedCompensation * _time;
+
+			//方向に応じた回転処理
+			_transform.rotation = Quaternion.LookRotation(_moveDir);
 		}
 	}
 }
