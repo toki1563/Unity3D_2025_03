@@ -44,6 +44,8 @@ public class R_PlayerManager : MonoBehaviour
     //’e
     [SerializeField, Header("’e”­Ë‘¬“x")] float _bulletSpeed;
 
+    //HP
+    [SerializeField, Header("‘Ì—Í")] float _HP;
 	#endregion
 
 
@@ -70,25 +72,21 @@ public class R_PlayerManager : MonoBehaviour
         //³–ÊˆÚ“®
         if (Input.GetKey(KeyCode.W))
         {
-            _transform.position += transform.forward * _moveSpeed * _time;
         }
 
-        //¶‚É•ûŒü•ÏŠ·
+        //¶ˆÚ“®
         if (Input.GetKey(KeyCode.A))
         {
-            _transform.Rotate(0, -_rotSpeed, 0);
         }
 
-        //‰E‚É•ûŒü•ÏŠ·
+        //‰EˆÚ“®
         if (Input.GetKey(KeyCode.D))
         {
-            _transform.Rotate(0, _rotSpeed, 0);
         }
 
-        //³–ÊŒã‘Ş
+        //Œã‚ëˆÚ“®
         if (Input.GetKey(KeyCode.S))
         {
-            _transform.position += -transform.forward * _moveSpeed * _time;
         }
     }
 }
