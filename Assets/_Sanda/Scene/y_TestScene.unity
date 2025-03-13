@@ -639,7 +639,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1754536764}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88653a9f98452e04d94c8875ee8fec99, type: 3}
+  m_Script: {fileID: 11500000, guid: ce00d6d2131e066479d2b8f906d38641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 10
@@ -650,8 +650,7 @@ MonoBehaviour:
   modeTranstionTime: 1
   targetFollowTime: 1
   fireRate: 3
-  patrolPos:
-  - {fileID: 0}
+  patrolPos: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
