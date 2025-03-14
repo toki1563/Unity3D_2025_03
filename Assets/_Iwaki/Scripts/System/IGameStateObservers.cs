@@ -17,6 +17,11 @@ interface IStageClearObserver
     void OnStageClear();
 }
 
+interface IGameStartObserver
+{
+    void OnGameStart();
+}
+
 /// <summary>
 /// Start時にGameStateControllerの関数が自動的に登録されるアクションを実装します
 /// </summary>
@@ -37,4 +42,9 @@ interface IStageClearSender
     /// スレージクリアを通知します
     /// </summary>
     event Action SendStageClear;
+}
+
+interface IGameStartSender
+{
+    event Action SendGameStart;
 }

@@ -5,27 +5,45 @@ using UnityEngine;
 /// </summary>
 public class GameStateController : MonoBehaviour
 {
-    [SerializeField] private GameState currentState = GameState.Default;
+    [SerializeField] private GameState currentState = GameState.WaitStart;
 
     private void Start()
     {
         foreach (var obj in FindObjectsOfType<MonoBehaviour>())
         {
-            if (obj is IGameOverSender s1)
+            switch(obj)
             {
-                s1.SendGameOver += GameOver;
+                case IGameStartSender s:
+                    s.SendGameStart += GameStart;
+                    break;
+                case IGameOverSender s:
+                    s.SendGameOver += GameOver;
+                    break;
+                case IStageClearSender s:
+                    s.SendStageClear += StageClear;
+                    break;
             }
+        }
+    }
 
-            if (obj is IStageClearSender s2)
+    public void GameStart()
+    {
+        if (currentState != GameState.WaitStart) return;
+
+        currentState = GameState.Playing;
+
+        foreach (var obj in FindObjectsOfType<MonoBehaviour>())
+        {
+            if (obj is IGameStartObserver observer)
             {
-                s2.SendStageClear += StageClear;
+                observer.OnGameStart();
             }
         }
     }
 
     public void GameOver()
     {
-        if (currentState != GameState.Default) return;
+        if (currentState != GameState.Playing) return;
 
         currentState = GameState.GameOver;
 
@@ -40,7 +58,7 @@ public class GameStateController : MonoBehaviour
 
     public void StageClear()
     {
-        if (currentState != GameState.Default) return;
+        if (currentState != GameState.Playing) return;
 
         currentState = GameState.StageClear;
 
@@ -56,7 +74,8 @@ public class GameStateController : MonoBehaviour
 
 public enum GameState
 {
-    Default,
+    WaitStart,
+    Playing,
     GameOver,
     StageClear,
 }
