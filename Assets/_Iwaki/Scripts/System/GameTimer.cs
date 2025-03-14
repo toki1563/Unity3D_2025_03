@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// ステージ内の制限時間の管理、タイムアップの通知を行うクラス。
 /// </summary>
-public class GameTimer : MonoBehaviour, IGameOverSender
+public class GameTimer : MonoBehaviour, IGameOverSender, IGameStateReceiver
 {
     [SerializeField] bool enableTimer;
     [SerializeField, Header("制限時間(秒)")] float timeLimit = 180;
@@ -14,6 +14,11 @@ public class GameTimer : MonoBehaviour, IGameOverSender
     float currentTimer;
 
     public event Action SendGameOver;
+
+    public Action OnGameStart => TimerStart;
+    public Action OnGameOver => TimerStop;
+    public Action OnStageClear => TimerStop;
+
 
     private void Start()
     {
