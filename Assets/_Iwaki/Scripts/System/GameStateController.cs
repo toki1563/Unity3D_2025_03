@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -7,11 +8,13 @@ public class GameStateController : MonoBehaviour
 {
     [SerializeField] private GameState currentState = GameState.WaitStart;
 
+    private readonly List<IGameStateReceiver> receivers = new();
+
     private void Start()
     {
         foreach (var obj in FindObjectsOfType<MonoBehaviour>())
         {
-            switch(obj)
+            switch (obj)
             {
                 case IGameStartSender s:
                     s.SendGameStart += GameStart;
@@ -24,6 +27,14 @@ public class GameStateController : MonoBehaviour
                     break;
             }
         }
+
+        foreach (var obj in FindObjectsOfType<MonoBehaviour>())
+        {
+            if (obj is IGameStateReceiver receiver)
+            {
+                receivers.Add(receiver);
+            }
+        }
     }
 
     public void GameStart()
@@ -32,12 +43,9 @@ public class GameStateController : MonoBehaviour
 
         currentState = GameState.Playing;
 
-        foreach (var obj in FindObjectsOfType<MonoBehaviour>())
+        for (int i = 0; i < receivers.Count; i++)
         {
-            if (obj is IGameStartObserver observer)
-            {
-                observer.OnGameStart();
-            }
+            receivers[i].OnGameStart?.Invoke();
         }
     }
 
@@ -47,12 +55,9 @@ public class GameStateController : MonoBehaviour
 
         currentState = GameState.GameOver;
 
-        foreach (var obj in FindObjectsOfType<MonoBehaviour>())
+        for (int i = 0; i < receivers.Count; i++)
         {
-            if (obj is IGameOverObserver observer)
-            {
-                observer.OnGameOver();
-            }
+            receivers[i].OnGameOver?.Invoke();
         }
     }
 
@@ -62,12 +67,9 @@ public class GameStateController : MonoBehaviour
 
         currentState = GameState.StageClear;
 
-        foreach (var obj in FindObjectsOfType<MonoBehaviour>())
+        for (int i = 0; i < receivers.Count; i++)
         {
-            if (obj is IStageClearObserver observer)
-            {
-                observer.OnStageClear();
-            }
+            receivers[i].OnStageClear?.Invoke();
         }
     }
 }

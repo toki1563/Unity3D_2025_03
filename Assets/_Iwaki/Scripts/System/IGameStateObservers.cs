@@ -2,24 +2,13 @@
 using System;
 
 /// <summary>
-/// ゲームオーバー時に通知を受け取る
+/// ゲームステート遷移時に発火されるイベントを実装します
 /// </summary>
-interface IGameOverObserver
+interface IGameStateReceiver
 {
-    void OnGameOver();
-}
-
-/// <summary>
-/// ステージクリア時に通知を受け取る
-/// </summary>
-interface IStageClearObserver
-{
-    void OnStageClear();
-}
-
-interface IGameStartObserver
-{
-    void OnGameStart();
+    Action OnGameStart { get; }
+    Action OnGameOver { get; }
+    Action OnStageClear { get; }
 }
 
 /// <summary>
