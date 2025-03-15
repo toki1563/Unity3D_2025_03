@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ゲームオーバー・ステージクリアを通知するクラス
+/// ゲームステートの変更を通知するクラス
 /// </summary>
 public class GameStateController : MonoBehaviour
 {
@@ -41,6 +41,7 @@ public class GameStateController : MonoBehaviour
     {
         if (currentState != GameState.WaitStart) return;
 
+        Debug.Log("GameStart");
         currentState = GameState.Playing;
 
         for (int i = 0; i < receivers.Count; i++)
@@ -53,6 +54,7 @@ public class GameStateController : MonoBehaviour
     {
         if (currentState != GameState.Playing) return;
 
+        Debug.Log("GameOver");
         currentState = GameState.GameOver;
 
         for (int i = 0; i < receivers.Count; i++)
@@ -65,6 +67,7 @@ public class GameStateController : MonoBehaviour
     {
         if (currentState != GameState.Playing) return;
 
+        Debug.Log("StageClear");
         currentState = GameState.StageClear;
 
         for (int i = 0; i < receivers.Count; i++)
