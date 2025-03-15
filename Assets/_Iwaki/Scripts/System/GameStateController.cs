@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class GameStateController : MonoBehaviour
 {
-    [SerializeField] private GameState currentState = GameState.WaitStart;
+    [SerializeField] GameState currentState = GameState.WaitStart;
 
     private readonly List<IGameStateReceiver> receivers = new();
 
