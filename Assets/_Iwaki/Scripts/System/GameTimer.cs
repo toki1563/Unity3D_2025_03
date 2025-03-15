@@ -23,7 +23,6 @@ public class GameTimer : MonoBehaviour, IGameOverSender, IGameStateReceiver
     private void Start()
     {
         currentTimer = timeLimit;
-        UpdateTimerText();
     }
 
     private void Update()
@@ -38,16 +37,14 @@ public class GameTimer : MonoBehaviour, IGameOverSender, IGameStateReceiver
                 TimerStop();
                 SendGameOver.Invoke();
             }
-
-            UpdateTimerText();
         }
     }
 
-    private void UpdateTimerText()
+    public string GetTimerText()
     {
         var timeSpan = TimeSpan.FromSeconds(currentTimer);
         var formattedTime = timeSpan.ToString(@"mm\:ss\.ff");
-        timerText.text = formattedTime;
+        return formattedTime;
     }
 
     public void TimerStart()
