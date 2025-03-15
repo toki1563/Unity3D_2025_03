@@ -61,7 +61,7 @@ public class GameSceneManager : ScriptableObject
         SceneManager.LoadScene(clearSceneName);
     }
 
-    public void GameOver()
+    public void Restart()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

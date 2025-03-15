@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// シーンのロード処理（アニメーションから呼び出す用）
@@ -38,9 +39,9 @@ public class SceneLoader : MonoBehaviour
         gameSceneManager.LoadClear();
     }
 
-    public async void GameOver()
+    public async void Restart()
     {
         await WaitTransition();
-        gameSceneManager.GameOver();
+        gameSceneManager.Restart();
     }
 }
