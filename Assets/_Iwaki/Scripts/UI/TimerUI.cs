@@ -6,9 +6,18 @@ using UnityEngine.UI;
 /// </summary>
 public class TimerUI : MonoBehaviour
 {
-    [SerializeField] GameTimer gameTimer;
     [SerializeField] string timerFormat = "mm':'ss'.'ff";
     [SerializeField] Text text;
+
+    GameTimer gameTimer;
+
+    private void Start()
+    {
+        if (gameTimer == null)
+        {
+            gameTimer = FindAnyObjectByType<GameTimer>();
+        }
+    }
 
     private void Update()
     {
