@@ -592,39 +592,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4291165515855725330, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4291165515855725330, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4291165515855725330, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 230.20972
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4291165515855725330, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -134.5102
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6085632199416623294, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6085632199416623294, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6085632199416623294, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 720.62915
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6085632199416623294, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -134.5102
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6345767865487174822, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_Text
       value: "\u30B2\u30FC\u30E0\u30AA\u30FC\u30D0\u30FC"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6905214157316401733, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -809,6 +813,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 859153116}
   m_CullTransparentMesh: 1
+--- !u!1 &1184000032 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1084006975231655297, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
+  m_PrefabInstance: {fileID: 348414180}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1358221776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,7 +1046,8 @@ PlayableDirector:
   - key: {fileID: -8760119021720882044, guid: ce664bc024841c44682533470ef2ac3d, type: 2}
     value: {fileID: 348414181}
   m_ExposedReferences:
-    m_References: []
+    m_References:
+    - b20b4c5f10ad50c43b4a96c1c53d30ba: {fileID: 1184000032}
 --- !u!1 &2051216732
 GameObject:
   m_ObjectHideFlags: 0
@@ -1164,6 +1174,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 844784353029227153, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
+      propertyPath: m_Color.b
+      value: 0.1960784
+      objectReference: {fileID: 0}
+    - target: {fileID: 844784353029227153, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
+      propertyPath: m_Color.g
+      value: 0.1960784
+      objectReference: {fileID: 0}
+    - target: {fileID: 844784353029227153, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
+      propertyPath: m_Color.r
+      value: 0.1960784
+      objectReference: {fileID: 0}
     - target: {fileID: 1471273894258883190, guid: 86ad264714eb82b4f98b050f3d315460, type: 3}
       propertyPath: m_Name
       value: StageClearCanvas
@@ -1374,7 +1396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableTimer: 0
-  timeLimit: 5
+  timeLimit: 1
   timerText: {fileID: 0}
 --- !u!114 &6014241418378490370
 MonoBehaviour:
