@@ -40,10 +40,10 @@ public class GameTimer : MonoBehaviour, IGameOverSender, IGameStateReceiver
         }
     }
 
-    public string GetTimerText()
+    public string GetTimerText(string format)
     {
         var timeSpan = TimeSpan.FromSeconds(currentTimer);
-        var formattedTime = timeSpan.ToString(@"mm\:ss\.ff");
+        var formattedTime = timeSpan.ToString(format);
         return formattedTime;
     }
 

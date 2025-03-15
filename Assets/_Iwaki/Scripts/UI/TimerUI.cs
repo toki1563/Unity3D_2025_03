@@ -7,10 +7,11 @@ using UnityEngine.UI;
 public class TimerUI : MonoBehaviour
 {
     [SerializeField] GameTimer gameTimer;
+    [SerializeField] string timerFormat = "mm':'ss'.'ff";
     [SerializeField] Text text;
 
     private void Update()
     {
-        text.text = gameTimer.GetTimerText();
+        text.text = gameTimer.GetTimerText(timerFormat);
     }
 }
