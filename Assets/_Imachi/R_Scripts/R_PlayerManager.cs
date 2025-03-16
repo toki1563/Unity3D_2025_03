@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 
 /// <summary>
-/// プレイヤーを管理するクラス
+/// プレイヤー全体を管理するクラス
 /// </summary>
 public class R_PlayerManager : MonoBehaviour
 {
 	#region シングルトン
 	static R_PlayerManager instance;
 
-	public R_PlayerManager Instance
+	public static  R_PlayerManager Instance
 	{
 		get
 		{
@@ -23,6 +20,7 @@ public class R_PlayerManager : MonoBehaviour
 			return instance;
 		}
 	}
+
 
 	public void Awake()
 	{
@@ -36,27 +34,45 @@ public class R_PlayerManager : MonoBehaviour
 	#endregion
 
 
+
 	#region 変数
 
-	//パラメーター
-	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed = 2.0f;
-	[SerializeField, Header("プレイヤーのHP")] float _HP;
-	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] float _bulletSpeed;
-
-	float _speed​​Compensation;	//速度補正
-	Vector3 _moveDir;			//移動方向
-	Transform _transform;       //キャッシュ用
-	float _time;                //デルタタイム格納用
-
-
-	enum ACTION
+	/// <summary>
+	/// 現在のプレイヤーの行動タイプ 移動中はdefault
+	/// </summary>
+	public enum ACTION
 	{
-		ATTACK,
-		DEFENCE,
-		RELOAD
+		ATTACK, DEFENCE, RELOAD, DEFAULT
 	}
 
-	ACTION _actionType;
+
+	[SerializeField] GameObject _bulletPrefab;
+	[SerializeField] Transform _bulletShotTran;
+
+	[Header("パラメータ")]
+	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed;
+	[SerializeField, Header("プレイヤーのHP")] float _HP;
+	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] int _maxBulletCount;
+	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletSpeed;
+
+
+	[SerializeField]ACTION _actionType = ACTION.DEFAULT;					//行動タイプ
+	Transform _transform;									//キャッシュ用
+	float _time;											//デルタタイム格納用
+	Vector3 _playerDir;                                     //方向
+	float _defence = 1.0f;
+
+	public ACTION _ActionType { get => _actionType; set => _actionType = value; }
+	public Transform _Transform { get => _transform; set => _transform = value; }
+	public Vector3 _PlayerDir { get => _playerDir; set => _playerDir = value; }
+	public float _Time { get => _time;}
+	public float _MoveSpeed { get => _moveSpeed;}
+	public GameObject _BulletPrefab { get => _bulletPrefab;}
+	public Transform _BulletShotTran { get => _bulletShotTran;}
+	public float _BulletSpeed { get => _bulletSpeed; }
+	public int _MaxBulletCount { get => _maxBulletCount;}
+	public float _Defence { get => _defence; set => _defence = value; }
+
 	#endregion
 
 
@@ -65,67 +81,67 @@ public class R_PlayerManager : MonoBehaviour
 	{
 		_transform = transform;
 		_time = Time.deltaTime;
+		_playerDir = Vector3.forward;
 	}
 
 
 	void Update()
 	{
+		//移動
+		R_PlayerMove.Instance._PlayerMove();
 
-		//移動速度補正
-		switch (_actionType)
+		//攻撃
+		if (Input.GetKey(KeyCode.Space))
 		{
-			case ACTION.ATTACK:
-				_speed​​Compensation = 0.5f;
-				break;
-			case ACTION.DEFENCE:
-				_speed​​Compensation = 0.25f;
-				break;
-			case ACTION.RELOAD:
-				_speed​​Compensation = 0.5f;
-				break;
-			default://通常時
-				_speed​​Compensation = 1.0f;
-				break;
+			if (R_PlayerAttack.Instance._CanBullet && !R_PlayerAttack.Instance._CanReload)
+			{
+				_actionType = ACTION.ATTACK;
+				R_PlayerAttack.Instance._StartAttack();
+			}
 		}
 
+		//リロード
+		if (Input.GetKeyDown(KeyCode.Space) && R_PlayerAttack.Instance._CanReload || Input.GetKeyDown(KeyCode.R))
+		{
+			if (R_PlayerAttack.Instance._CanReload)
+			{
+				//弾数が０の場合
+				_actionType = ACTION.RELOAD;
+				R_PlayerAttack.Instance._StartReload(2.0f);
+			}
+			else
+			{
+				//弾数が残っている場合
+				_actionType = ACTION.RELOAD;
+				R_PlayerAttack.Instance._StartReload(1.0f);
+			}
+		}
 
-		_PlayerMove();
+		////リロード中に再度押されたらキャンセル
+		//if (R_PlayerAttack.Instance._IsBulletReload && Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.R))
+		//{
+		//	R_PlayerAttack.Instance._IsBulletReload = false;
+		//	//_actionType = ACTION.DEFAULT;
+		//}
+
+
+		//防御
+		if (Input.GetKeyDown(KeyCode.LeftShift))
+		{
+			_actionType = ACTION.DEFENCE;
+			R_PlayerAttack.Instance._IsBulletReload = false;
+			R_PlayerDefence.Instance._PlayerDefence();
+		}
+		else if(Input.GetKeyUp(KeyCode.LeftShift))
+		{
+			//離されたら通常に戻す
+			_actionType = ACTION.DEFAULT;
+			_defence = 1.0f;
+		}
+
 	}
 
 
 
-	/// <summary>
-	/// プレイヤーの移動処理
-	/// </summary>
-	void _PlayerMove()
-	{
-		//何も入力が無い場合は方向初期化
-		_moveDir = Vector3.zero;
 
-		//正面方向へ加算
-		if (Input.GetKey(KeyCode.W)) _moveDir += Vector3.forward;
-
-		//左方向へ加算
-		if (Input.GetKey(KeyCode.A)) _moveDir += Vector3.left;
-
-		//右方向へ加算
-		if (Input.GetKey(KeyCode.D)) _moveDir += Vector3.right;
-
-		//後ろ方向へ加算
-		if (Input.GetKey(KeyCode.S)) _moveDir += Vector3.back;
-
-
-		//移動キーが押されていた場合
-		if (_moveDir != Vector3.zero)
-		{
-			//移動の正規化
-			_moveDir = _moveDir.normalized; 
-
-			//移動処理
-			_transform.position += _moveDir * _moveSpeed * _speedCompensation * _time;
-
-			//方向に応じた回転処理
-			_transform.rotation = Quaternion.LookRotation(_moveDir);
-		}
-	}
 }
