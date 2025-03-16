@@ -53,14 +53,15 @@ public class R_PlayerManager : MonoBehaviour
 	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed;
 	[SerializeField, Header("プレイヤーのHP")] float _HP;
 	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] int _maxBulletCount;
-	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletPower;
+	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletSpeed;
 	[SerializeField, Header("プレイヤーのリロードの速度")] float _bulletReloadSpeed;
 
 
-	[SerializeField]ACTION _actionType = ACTION.DEFAULT;	//行動タイプ
+	[SerializeField]ACTION _actionType = ACTION.DEFAULT;					//行動タイプ
 	Transform _transform;									//キャッシュ用
 	float _time;											//デルタタイム格納用
-	Vector3 _playerDir;										//方向
+	Vector3 _playerDir;                                     //方向
+	float _defence = 1.0f;
 
 	public ACTION _ActionType { get => _actionType; set => _actionType = value; }
 	public Transform _Transform { get => _transform; set => _transform = value; }
@@ -69,8 +70,9 @@ public class R_PlayerManager : MonoBehaviour
 	public float _MoveSpeed { get => _moveSpeed;}
 	public GameObject _BulletPrefab { get => _bulletPrefab;}
 	public Transform _BulletShotTran { get => _bulletShotTran;}
-	public float _BulletPower { get => _bulletPower;}
+	public float _BulletSpeed { get => _bulletSpeed; }
 	public int _MaxBulletCount { get => _maxBulletCount;}
+	public float _Defence { get => _defence; set => _defence = value; }
 
 	#endregion
 
@@ -100,7 +102,7 @@ public class R_PlayerManager : MonoBehaviour
 		}
 
 		//リロード
-		if (Input.GetKeyDown(KeyCode.R))
+		if (Input.GetKeyDown(KeyCode.Space))
 		{
 			if (R_PlayerAttack.Instance._CanReload)
 			{
@@ -108,14 +110,24 @@ public class R_PlayerManager : MonoBehaviour
 				R_PlayerAttack.Instance._StartReload(_bulletReloadSpeed);
 			}
 		}
+		else if(Input.GetKeyDown(KeyCode.R))
+		{
+			_actionType = ACTION.RELOAD;
+			R_PlayerAttack.Instance._StartReload(_bulletReloadSpeed);
+		}
 
 		//防御
-		if (Input.GetKey(KeyCode.LeftShift))
+		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			_actionType = ACTION.DEFENCE;
 			R_PlayerDefence.Instance._PlayerDefence();
 		}
-
+		else if(Input.GetKeyUp(KeyCode.LeftShift))
+		{
+			//離されたら通常に戻す
+			_actionType = ACTION.DEFAULT;
+			_defence = 1.0f;
+		}
 
 	}
 

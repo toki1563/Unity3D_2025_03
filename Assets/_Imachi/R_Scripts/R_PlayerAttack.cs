@@ -35,7 +35,7 @@ public class R_PlayerAttack : MonoBehaviour
 
 
 	Rigidbody _rb;
-	int _currentBulletCount;							//現在の弾数
+	[SerializeField]int _currentBulletCount;							//現在の弾数
 	float _bulletFireInterval = 0.2f;					//発射間隔
 	bool _canBullet = true;								//True：発射可能
 	bool _canReload = false;							//True：リロード可能
@@ -84,7 +84,7 @@ public class R_PlayerAttack : MonoBehaviour
 
 		//発射
 		Vector3 bulletDir = R_PlayerManager.Instance._PlayerDir;
-		_rb.AddForce(bulletDir * R_PlayerManager.Instance._BulletPower, ForceMode.Impulse);
+		_rb.AddForce(bulletDir * R_PlayerManager.Instance._BulletSpeed, ForceMode.Impulse);
 
 		Destroy(bulletObj, 1.0f);
 
@@ -104,12 +104,11 @@ public class R_PlayerAttack : MonoBehaviour
 	/// </summary>
 	public void _StartReload(float _reloadInterval)
 	{
-		if (!_canReload) return;
 		StartCoroutine(_PlayerReload(_reloadInterval));
 	}
 
 	/// <summary>
-	/// リロード完了速度中に他のアクションをしたら中断する（※未実装）
+	/// リロード完了速度中に防御をしたら中断する（※未実装）
 	/// </summary>
 	/// <param name="_reloadInterval">リロード完了速度</param>
 	/// <returns></returns>

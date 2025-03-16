@@ -35,18 +35,9 @@ public class R_PlayerDefence : MonoBehaviour
 	float _defencePower = 0.5f;
 
 
-	void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
 
     public void _PlayerDefence()
     {
-    }
+		R_PlayerManager.Instance._Defence = _defencePower;
+	}
 }
