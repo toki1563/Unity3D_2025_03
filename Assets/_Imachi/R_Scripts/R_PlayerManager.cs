@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 
 /// <summary>
-/// プレイヤーを管理するクラス
+/// プレイヤー全体を管理するクラス
 /// </summary>
 public class R_PlayerManager : MonoBehaviour
 {
 	#region シングルトン
 	static R_PlayerManager instance;
 
-	public R_PlayerManager Instance
+	public static  R_PlayerManager Instance
 	{
 		get
 		{
@@ -24,6 +21,7 @@ public class R_PlayerManager : MonoBehaviour
 		}
 	}
 
+
 	public void Awake()
 	{
 		//インスタンスが既に存在していたら自身を消去する
@@ -35,40 +33,43 @@ public class R_PlayerManager : MonoBehaviour
 	}
 	#endregion
 
-	#region ENUM
+
+
+	#region 変数
 
 	/// <summary>
 	/// 現在のプレイヤーの行動タイプ 移動中はdefault
 	/// </summary>
-	enum ACTION
+	public enum ACTION
 	{
-		ATTACK,DEFENCE,RELOAD
+		ATTACK, DEFENCE, RELOAD, DEFAULT
 	}
 
-	/// <summary>
-	/// 現在の押された移動キー
-	/// </summary>
-	enum INPUT
-	{
-		W_KEY, A_KEY, S_KEY, D_KEY, NONE
-	}
 
-	#endregion
+	[SerializeField] GameObject _bulletPrefab;
+	[SerializeField] Transform _bulletShotTran;
 
-	#region 変数
-
-	//パラメーター
-	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed = 2.0f;
+	[Header("パラメータ")]
+	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed;
 	[SerializeField, Header("プレイヤーのHP")] float _HP;
-	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] float _maxBulletCount;
+	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] int _maxBulletCount;
+	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletPower;
 
-	float _speed​​Compensation;	//速度補正
-	Vector3 _moveDir;			//移動方向
-	Transform _transform;       //キャッシュ用
-	float _time;                //デルタタイム格納用
 
-	ACTION _actionType;
-	List<INPUT> _pressedInput = new List<INPUT>();	//押されている方向キーを格納する　何も押されていないときは空
+	ACTION _actionType = ACTION.DEFAULT;	//行動タイプ
+	Transform _transform;					//キャッシュ用
+	float _time;							//デルタタイム格納用
+	Vector3 _playerDir;						//方向
+
+	public ACTION _ActionType { get => _actionType; set => _actionType = value; }
+	public Transform _Transform { get => _transform; set => _transform = value; }
+	public Vector3 _PlayerDir { get => _playerDir; set => _playerDir = value; }
+	public float _Time { get => _time;}
+	public float _MoveSpeed { get => _moveSpeed;}
+	public GameObject _BulletPrefab { get => _bulletPrefab;}
+	public Transform _BulletShotTran { get => _bulletShotTran;}
+	public float _BulletPower { get => _bulletPower;}
+	public int _MaxBulletCount { get => _maxBulletCount;}
 
 	#endregion
 
@@ -78,116 +79,29 @@ public class R_PlayerManager : MonoBehaviour
 	{
 		_transform = transform;
 		_time = Time.deltaTime;
+		_playerDir = Vector3.forward;
 	}
 
 
 	void Update()
 	{
+		//移動
+		R_PlayerMove.Instance._PlayerMove();
 
-		//移動速度補正
-		switch (_actionType)
+		//攻撃
+		if (Input.GetKey(KeyCode.Space))
 		{
-			case ACTION.ATTACK:
-				_speed​​Compensation = 0.5f;
-				break;
-			case ACTION.DEFENCE:
-				_speed​​Compensation = 0.25f;
-				break;
-			case ACTION.RELOAD:
-				_speed​​Compensation = 0.5f;
-				break;
-			default://通常時
-				_speed​​Compensation = 1.0f;
-				break;
+			if (R_PlayerAttack.Instance._CanBullet && !R_PlayerAttack.Instance._CanReload) R_PlayerAttack.Instance._PlayerAttack();
 		}
 
-
-		_PlayerMove();
-	}
-
-
-	/// <summary>
-	/// プレイヤーの移動処理
-	/// </summary>
-	void _PlayerMove()
-	{
-
-		//何も入力が無い場合は方向・リスト初期化
-		if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+		//リロード
+		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			_moveDir = Vector3.zero;
-			_pressedInput.Clear();
-		}
-
-
-		//正面方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.W)) _pressedInput.Add(INPUT.W_KEY);
-
-		//後ろ方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.S)) _pressedInput.Add(INPUT.S_KEY);
-
-		//左方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.A)) _pressedInput.Add(INPUT.A_KEY);
-
-		//右方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.D)) _pressedInput.Add(INPUT.D_KEY);
-
-
-
-		//リストの０番目と１番目が埋まったら、0番目を削除して更新
-		if (_pressedInput.Count > 2)
-		{
-			_pressedInput.RemoveAt(0);
-		}
-
-
-		//リスト０番目、１番目の移動方向を加算する
-		foreach (INPUT key in _pressedInput)
-		{
-			switch (key)
-			{
-				case INPUT.W_KEY: 
-					_moveDir += Vector3.forward;
-
-					//逆方向のキーが押された場合リストの最後のキーを優先
-					if (_pressedInput[0] == INPUT.S_KEY) _moveDir += Vector3.forward;
-					break;
-
-				case INPUT.A_KEY:
-					_moveDir += Vector3.left;
-
-					//逆方向のキーが押された場合リストの最後のキーを優先
-					if (_pressedInput[0] == INPUT.D_KEY) _moveDir += Vector3.left;
-					break;
-
-				case INPUT.S_KEY:
-					_moveDir += Vector3.back;
-
-					//逆方向のキーが押された場合リストの最後のキーを優先
-					if (_pressedInput[0] == INPUT.W_KEY) _moveDir += Vector3.back;
-					break;
-
-				case INPUT.D_KEY:
-					_moveDir += Vector3.right;
-
-					//逆方向のキーが押された場合リストの最後のキーを優先
-					if (_pressedInput[0] == INPUT.A_KEY) _moveDir += Vector3.right;
-					break;
-			}
-		}
-
-
-		//移動キーが押されていた場合
-		if (_moveDir != Vector3.zero)
-		{
-			//移動の正規化
-			_moveDir = _moveDir.normalized; 
-
-			//移動処理
-			_transform.position += _moveDir * _moveSpeed * _speedCompensation * _time;
-
-			//移動方向に回転する
-			_transform.rotation = Quaternion.LookRotation(_moveDir);
+			if (R_PlayerAttack.Instance._CanReload) R_PlayerAttack.Instance._PlayerReload();
 		}
 	}
+
+
+
+
 }
