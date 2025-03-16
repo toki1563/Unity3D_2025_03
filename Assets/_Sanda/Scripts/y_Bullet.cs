@@ -20,10 +20,11 @@ public class y_Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
             // ダメージを送る
-            Debug.Log("プレイヤーにダメージがヒット");
+            IDamage player = other.GetComponent<IDamage>();
+            player.TakeDamage(1);
             Destroy(gameObject); // ヒット時に削除
         }
     }

@@ -3,7 +3,7 @@
 /// <summary>
 /// プレイヤー全体を管理するクラス
 /// </summary>
-public class R_PlayerManager : MonoBehaviour
+public class R_PlayerManager : MonoBehaviour, IDamage
 {
 	#region シングルトン
 	static R_PlayerManager instance;
@@ -141,7 +141,20 @@ public class R_PlayerManager : MonoBehaviour
 
 	}
 
+    // ダメージ受け処理
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("Bullet"))
+		{
 
+			//Debug.Log("エネミーからダメージ受けた");
+		}
+    }
 
+	// ダメージを受けた時
+    public void TakeDamage(int damage)
+    {
+
+    }
 
 }

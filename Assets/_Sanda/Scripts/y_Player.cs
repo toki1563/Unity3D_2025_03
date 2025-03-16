@@ -26,8 +26,10 @@ public class y_Player : MonoBehaviour
         // インターフェースを呼び出すテスト
         if(other.gameObject.CompareTag("Enemy"))
         {
-            IEnemy enemy = other.GetComponent<IEnemy>();
+            IDamage enemy = other.GetComponent<IDamage>();
             enemy.TakeDamage(5);
+
+            Debug.Log("aaa");
         }
     }
 }

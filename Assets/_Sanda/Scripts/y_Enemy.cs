@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class y_Enemy : MonoBehaviour, IEnemy
+public class y_Enemy : MonoBehaviour, IDamage
 {
     [SerializeField, Header("最大体力値")]
     float maxHP = 10.0f;
