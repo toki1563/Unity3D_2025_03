@@ -1,0 +1,39 @@
+﻿
+using System;
+
+/// <summary>
+/// ゲームステート遷移時に発火されるイベントを実装します
+/// </summary>
+interface IGameStateReceiver
+{
+    Action OnGameStart { get; }
+    Action OnGameOver { get; }
+    Action OnStageClear { get; }
+}
+
+/// <summary>
+/// Start時にGameStateControllerの関数が自動的に登録されるアクションを実装します
+/// </summary>
+interface IGameOverSender
+{
+    /// <summary>
+    /// ゲームオーバーを通知します
+    /// </summary>
+    event Action SendGameOver;
+}
+
+/// <summary>
+/// Start時にGameStateControllerの関数が自動的に登録されるアクションを実装します
+/// </summary>
+interface IStageClearSender
+{
+    /// <summary>
+    /// スレージクリアを通知します
+    /// </summary>
+    event Action SendStageClear;
+}
+
+interface IGameStartSender
+{
+    event Action SendGameStart;
+}

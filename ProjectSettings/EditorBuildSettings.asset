@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Sanda/Scene/y_TestScene.unity
-    guid: cd66acfcc2372b545888afc049057f79
+    path: Assets/_Iwaki/Scenes/Title.unity
+    guid: f4dcdb4369eaa4d449e8d013ec0309d3
+  - enabled: 1
+    path: Assets/_Iwaki/Scenes/Clear.unity
+    guid: 98848153600872b40b6dcaa53a32c9b7
+  - enabled: 1
+    path: Assets/_Iwaki/Scenes/Stage1.unity
+    guid: 4acc61491b99a6747992a2776ef37166
+  - enabled: 1
+    path: Assets/_Iwaki/Scenes/Stage2.unity
+    guid: b30503854ac9bdf4e8ef2b0db3a289c7
   m_configObjects: {}
