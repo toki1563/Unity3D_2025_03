@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static UnityEngine.GraphicsBuffer;
 
 public class y_Enemy : MonoBehaviour, IEnemy
 {
@@ -14,21 +13,35 @@ public class y_Enemy : MonoBehaviour, IEnemy
     float moveSpeed = 1.0f;
     [SerializeField, Header("探索状態の視野距離")]
     float searchDistance = 5.0f;
+    [SerializeField, Header("探索の視野角(°)")]
+    float searchOfView = 45.0f;
     [SerializeField, Header("戦闘状態の視野距離")]
     float battleDistance = 8.0f;
+    [SerializeField, Header("戦闘の視野角(°)")]
+    float battleOfView = 90.0f;
     [SerializeField, Header("状態移行するときの秒数")]
     float modeTranstionTime = 1.0f;
-    [SerializeField, Header("戦闘状態遷移時にターゲットの方向を向くのにかかる時間")]
-    float targetFollowTime = 1.0f;
+    [SerializeField, Header("戦闘状態遷移時にターゲットの方向を向く速度")]
+    float targetFollowSpeed = 120.0f;
     [SerializeField, Header("1秒間で発射する数量")]
     int fireRate = 3;
+    [SerializeField, Header("プレイヤーを格納")]
+    Transform player;
     [SerializeField, Header("移動する場所を入れる")]
     Transform[] patrolPos;
+    [SerializeField, Header("無視する用の壁のレイヤーを入れる")]
+    LayerMask obstacleMask;
+    [SerializeField, Header("デバッグ用(探索判定の可視化)")]
+    bool isSearchDebug;
+    [SerializeField, Header("デバッグ用(戦闘判定の可視化)")]
+    bool isButtleDebug;
 
     int currentPatrolIndex = 0; // 現在の巡回番号
     float currentHP = 0.0f; // 現在の体力
     float stopDistance = 0.1f; // 停止する距離
+    float angleToPlayer = 0.0f; // プレイヤー向きの格納
     bool isDead = false;    // 死んだかどうか
+    bool isChangingState = false; // 状態遷移中かどうか
     NavMeshAgent agent; // ナビメッシュ
     Vector3 targetPosition; // 移動する位置
     Mode stateMode = Mode.SearchState; // 状態格納
@@ -47,6 +60,7 @@ public class y_Enemy : MonoBehaviour, IEnemy
         currentHP = maxHP;
         agent = GetComponent<NavMeshAgent>(); // ナビメッシュ取得
         agent.speed = moveSpeed; // 移動速度の設定
+        agent.angularSpeed = targetFollowSpeed; // プレイヤを見る速度
     }
 
     // 毎フレーム呼ばれる
@@ -66,8 +80,30 @@ public class y_Enemy : MonoBehaviour, IEnemy
                 {
                     MoveToNextPoint(); // 次のポイントを設定する処理
                 }
+
+
+                // プレイヤーを索敵
+                if (CanSearchPlayer() && !isChangingState)
+                {
+                    agent.isStopped = true; // 移動停止
+
+                    // バトルモード
+                    StartCoroutine(ChangeStateDelay(Mode.BattleState));
+                    Debug.Log("プレイヤー発見");
+                }
                 break;
             case Mode.BattleState: // 戦闘状態時
+
+                // 攻撃処理を書く
+
+                // プレイヤーが索敵外になったら
+                if (!CanSearchPlayer() && !isChangingState)
+                {
+                    agent.isStopped = false; // 移動再開
+                    // バトルモード
+                    StartCoroutine(ChangeStateDelay(Mode.SearchState));
+                    Debug.Log("プレイヤー発見");
+                }
                 break;
         }
     }
@@ -79,6 +115,17 @@ public class y_Enemy : MonoBehaviour, IEnemy
 
     }
 
+    // 状態遷移を一定時間後に行う
+    IEnumerator ChangeStateDelay(Mode newMode)
+    {
+        isChangingState = true;
+        yield return new WaitForSeconds(modeTranstionTime);
+        Debug.Log("バトルモード");
+        stateMode = newMode;
+        isChangingState = false;
+    }
+
+    // 次の移動地点の処理
     void MoveToNextPoint()
     {
         if (patrolPos.Length == 0) return;
@@ -96,6 +143,46 @@ public class y_Enemy : MonoBehaviour, IEnemy
         currentPatrolIndex = (currentPatrolIndex + 1) % patrolPos.Length; // ループする
     }
 
+    // プレイヤーの判定
+    bool CanSearchPlayer()
+    {
+        if (player == null) return false;
+
+        // プレイヤーとの距離の計算
+        Vector3 directionToPlayer = player.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
+
+        switch(stateMode)
+        {
+            case Mode.SearchState:
+                // 距離の確認
+                if (distanceToPlayer > searchDistance) return false;
+
+                // 視野角の確認
+                directionToPlayer.y = 0; // Y軸を無視する
+                angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer); // プレイヤーの向き
+                if (angleToPlayer > searchOfView / 2) return false;
+                break;
+            case Mode.BattleState:
+
+                if (distanceToPlayer > battleDistance) return false;
+
+                directionToPlayer.y = 0; // Y軸を無視する
+                angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+                if (angleToPlayer > battleOfView / 2) return false;
+                break;
+        }
+
+        // ③ レイキャストで障害物チェック
+        if (Physics.Raycast(transform.position, directionToPlayer, distanceToPlayer, obstacleMask))
+        {
+            return false; // 壁がある時は感知しない
+        }
+
+        return true;
+    }
+
+    // ダメージを受けた時の処理
     public void TakeDamage(int damage)
     {
         currentHP -= damage;
@@ -106,5 +193,39 @@ public class y_Enemy : MonoBehaviour, IEnemy
         }
 
         Debug.Log("TakeDamageが呼ばれた!!");
+    }
+
+    // デバッグ可視化用
+    void OnDrawGizmos()
+    {
+        if (isSearchDebug)
+        {
+            // 索敵範囲
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, searchDistance);
+
+            // 視野角の表示
+            Vector3 leftBoundary = Quaternion.Euler(0, -searchOfView / 2, 0) * transform.forward * searchDistance;
+            Vector3 rightBoundary = Quaternion.Euler(0, searchOfView / 2, 0) * transform.forward * searchDistance;
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
+            Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
+        }
+
+        if (isButtleDebug)
+        {
+            // 索敵範囲
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(transform.position, battleDistance);
+
+            // 視野角の表示
+            Vector3 leftBoundary = Quaternion.Euler(0, -battleOfView / 2, 0) * transform.forward * battleDistance;
+            Vector3 rightBoundary = Quaternion.Euler(0, battleOfView / 2, 0) * transform.forward * battleDistance;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
+            Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
+        }
     }
 }
