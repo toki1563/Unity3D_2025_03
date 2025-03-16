@@ -54,7 +54,6 @@ public class R_PlayerManager : MonoBehaviour
 	[SerializeField, Header("プレイヤーのHP")] float _HP;
 	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] int _maxBulletCount;
 	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletSpeed;
-	[SerializeField, Header("プレイヤーのリロードの速度")] float _bulletReloadSpeed;
 
 
 	[SerializeField]ACTION _actionType = ACTION.DEFAULT;					//行動タイプ
@@ -102,24 +101,35 @@ public class R_PlayerManager : MonoBehaviour
 		}
 
 		//リロード
-		if (Input.GetKeyDown(KeyCode.Space))
+		if (Input.GetKeyDown(KeyCode.Space) && R_PlayerAttack.Instance._CanReload || Input.GetKeyDown(KeyCode.R))
 		{
 			if (R_PlayerAttack.Instance._CanReload)
 			{
+				//弾数が０の場合
 				_actionType = ACTION.RELOAD;
-				R_PlayerAttack.Instance._StartReload(_bulletReloadSpeed);
+				R_PlayerAttack.Instance._StartReload(2.0f);
+			}
+			else
+			{
+				//弾数が残っている場合
+				_actionType = ACTION.RELOAD;
+				R_PlayerAttack.Instance._StartReload(1.0f);
 			}
 		}
-		else if(Input.GetKeyDown(KeyCode.R))
-		{
-			_actionType = ACTION.RELOAD;
-			R_PlayerAttack.Instance._StartReload(_bulletReloadSpeed);
-		}
+
+		////リロード中に再度押されたらキャンセル
+		//if (R_PlayerAttack.Instance._IsBulletReload && Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.R))
+		//{
+		//	R_PlayerAttack.Instance._IsBulletReload = false;
+		//	//_actionType = ACTION.DEFAULT;
+		//}
+
 
 		//防御
 		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			_actionType = ACTION.DEFENCE;
+			R_PlayerAttack.Instance._IsBulletReload = false;
 			R_PlayerDefence.Instance._PlayerDefence();
 		}
 		else if(Input.GetKeyUp(KeyCode.LeftShift))

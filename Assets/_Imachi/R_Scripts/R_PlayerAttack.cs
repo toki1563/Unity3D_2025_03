@@ -36,14 +36,14 @@ public class R_PlayerAttack : MonoBehaviour
 
 	Rigidbody _rb;
 	[SerializeField]int _currentBulletCount;							//現在の弾数
-	float _bulletFireInterval = 0.2f;					//発射間隔
+	float _bulletFireInterval = 0.2f;                   //発射間隔
 	bool _canBullet = true;								//True：発射可能
-	bool _canReload = false;							//True：リロード可能
+	bool _canReload = false;                            //True：リロード移行
+	[SerializeField]bool _isBulletReload = false;						//Trueリロード中
 
 	public bool _CanBullet { get => _canBullet;}
 	public bool _CanReload { get => _canReload;}
-
-
+	public bool _IsBulletReload { get => _isBulletReload; set => _isBulletReload = value; }
 
 	private void Start()
 	{
@@ -52,7 +52,7 @@ public class R_PlayerAttack : MonoBehaviour
 
 	private void Update()
 	{		
-		//弾が０以下になったらリロード可能にする
+		//弾が０以下になったらリロードへ移行する
 		if (_currentBulletCount <= 0) _canReload = true;
 	}
 
@@ -107,19 +107,30 @@ public class R_PlayerAttack : MonoBehaviour
 		StartCoroutine(_PlayerReload(_reloadInterval));
 	}
 
+
 	/// <summary>
-	/// リロード完了速度中に防御をしたら中断する（※未実装）
+	/// リロード完了速度中に防御をしたら中断する,再度押したらキャンセルする（※未実装）
 	/// </summary>
 	/// <param name="_reloadInterval">リロード完了速度</param>
 	/// <returns></returns>
 	public IEnumerator _PlayerReload(float _reloadInterval)
 	{
-		//リロード完了速度
-		yield return new WaitForSeconds(_reloadInterval);
+		//リロード完了時間を測る
+		_isBulletReload = true;
+		float reloadTimer = 0f;
+		while (reloadTimer < _reloadInterval)
+		{
+			//キャンセルされたら終了
+			if (!_isBulletReload) yield break;
 
-		//初期化
+			reloadTimer += R_PlayerManager.Instance._Time;
+			yield return null;
+		}
+
+		//リロード成功
 		_canReload = false;
 		_currentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
 		R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.DEFAULT;
+		_isBulletReload = false;
 	}
 }
