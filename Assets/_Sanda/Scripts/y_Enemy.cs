@@ -19,12 +19,18 @@ public class y_Enemy : MonoBehaviour, IEnemy
     float battleDistance = 8.0f;
     [SerializeField, Header("戦闘の視野角(°)")]
     float battleOfView = 90.0f;
-    [SerializeField, Header("状態移行するときの秒数")]
-    float modeTranstionTime = 1.0f;
+    [SerializeField, Header("探索状態に移行するときの秒数")]
+    float searchModeTransTime = 0.5f;
+    [SerializeField, Header("戦闘状態に移行するときの秒数")]
+    float battleModeTransTime = 1.0f;
     [SerializeField, Header("戦闘状態遷移時にターゲットの方向を向く速度")]
-    float targetFollowSpeed = 120.0f;
+    float targetFollowSpeed = 2.0f;
+    [SerializeField, Header("各ポイントでの待機時間")]
+    float[] waitTimes = {};
     [SerializeField, Header("1秒間で発射する数量")]
     int fireRate = 3;
+    [SerializeField, Header("弾のプレハブ")]
+    GameObject bulletPrefab;
     [SerializeField, Header("プレイヤーを格納")]
     Transform player;
     [SerializeField, Header("移動する場所を入れる")]
@@ -43,8 +49,11 @@ public class y_Enemy : MonoBehaviour, IEnemy
     bool isDead = false;    // 死んだかどうか
     bool isChangingState = false; // 状態遷移中かどうか
     NavMeshAgent agent; // ナビメッシュ
+    Coroutine fireCoroutine; // 射撃用コルーチン
+    Coroutine waitCoroutine; // 停止時のコルーチン
     Vector3 targetPosition; // 移動する位置
     Mode stateMode = Mode.SearchState; // 状態格納
+    Renderer rend;  // デバッグマテリアル表示用
 
     enum Mode // 状態管理
     {
@@ -60,13 +69,24 @@ public class y_Enemy : MonoBehaviour, IEnemy
         currentHP = maxHP;
         agent = GetComponent<NavMeshAgent>(); // ナビメッシュ取得
         agent.speed = moveSpeed; // 移動速度の設定
-        agent.angularSpeed = targetFollowSpeed; // プレイヤを見る速度
+        currentPatrolIndex = 0; // ここでインデックスを0に設定
+        MoveToNextPoint(); // 初めの移動ポイントへ
+        rend = GetComponent<Renderer>();
+        rend.material.color = Color.blue; // 色を青に変更
     }
 
     // 毎フレーム呼ばれる
     void Update()
     {
         if(isDead) return; // 死んでいるなら処理しない
+        if (player == null) return; // プレイヤーがいないときは処理をやめる
+
+        // 現在のポイントに到達したら、停止して次のポイントへ移動
+        if (!agent.pathPending && agent.remainingDistance <= stopDistance)
+        {
+            waitCoroutine = StartCoroutine(WaitPoint()); // 開始時の探索処理
+        }
+
 
         switch (stateMode)
         {
@@ -94,35 +114,95 @@ public class y_Enemy : MonoBehaviour, IEnemy
                 break;
             case Mode.BattleState: // 戦闘状態時
 
-                // 攻撃処理を書く
+                if (isChangingState) return; // 状態遷移中は処理しない
+
+                // 常にプレイヤーの方向を向く
+                // プレイヤーの方向を取得
+                Vector3 direction = player.position - transform.position;
+                direction.y = 0; // Y軸を無視
+
+                // 現在の向きとプレイヤー方向を補間して回転
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, targetFollowSpeed * Time.deltaTime);
 
                 // プレイヤーが索敵外になったら
                 if (!CanSearchPlayer() && !isChangingState)
                 {
-                    agent.isStopped = false; // 移動再開
-                    // バトルモード
+                    // 索敵モード
                     StartCoroutine(ChangeStateDelay(Mode.SearchState));
-                    Debug.Log("プレイヤー発見");
+                    Debug.Log("プレイヤー見失った");
                 }
                 break;
         }
     }
 
-    // 0.02秒毎に呼ばれる
-    void FixedUpdate()
-    {
-        if (isDead) return; // 死んでいるなら処理しない
-
-    }
-
     // 状態遷移を一定時間後に行う
     IEnumerator ChangeStateDelay(Mode newMode)
     {
+        // 射撃用コルーチンが動いていたら
+        if(fireCoroutine != null)
+        {
+            StopCoroutine(fireCoroutine); // 射撃用コルーチンを止める
+            fireCoroutine = null; // 値をnullにする
+        }
+        else if (waitCoroutine != null)
+        {
+            StopCoroutine(waitCoroutine); // 停止用コルーチンを止める
+            waitCoroutine = null;
+        }
+
         isChangingState = true;
-        yield return new WaitForSeconds(modeTranstionTime);
-        Debug.Log("バトルモード");
+        if (newMode == Mode.BattleState) // バトル状態時
+        {
+            // 探索状態に切り替わる時間
+            yield return new WaitForSeconds(battleModeTransTime);
+
+            fireCoroutine = StartCoroutine(FireCoroutine()); // 発射処理
+            rend.material.color = Color.red; // 色を青に変更
+        }
+        else if (newMode == Mode.SearchState) // 探索状態時
+        {
+            // 戦闘状態に切り替わる時間
+            yield return new WaitForSeconds(searchModeTransTime);
+
+            agent.isStopped = false; // 移動開始
+            currentPatrolIndex -= 1; // 探索復帰時にマイナスにする
+            MoveToNextPoint(); // 開始時の探索処理
+            rend.material.color = Color.blue; // 色を青に変更
+        }
         stateMode = newMode;
         isChangingState = false;
+    }
+
+    // 弾を撃ち続けるコルーチン
+    IEnumerator FireCoroutine()
+    {
+        float interval = 1f / fireRate; // 1秒をfireRateで割った時間間隔
+
+        while (true) // 無限ループで撃ち続ける
+        {
+            Fire(); // 発射処理
+            yield return new WaitForSeconds(interval); // 一定間隔で発射
+        }
+    }
+
+    // 弾を撃つ処理
+    void Fire()
+    {
+        // 自身から弾を生成
+        Instantiate(bulletPrefab, transform.position, transform.rotation);
+        Debug.Log("敵が弾を発射");
+    }
+
+    IEnumerator WaitPoint()
+    {
+        // 現在のパトロールポイントの待機時間
+        float waitTime = waitTimes[currentPatrolIndex];
+
+        agent.isStopped = true; // 移動を停止
+        yield return new WaitForSeconds(waitTime); // 設定した時間待機
+
+        agent.isStopped = false; // 移動再開
     }
 
     // 次の移動地点の処理
@@ -137,7 +217,6 @@ public class y_Enemy : MonoBehaviour, IEnemy
             patrolPos[currentPatrolIndex].position.z);
 
         agent.SetDestination(targetPosition); // 目的地設定
-        agent.isStopped = false; // 移動再開
 
         // 次の目的地へ
         currentPatrolIndex = (currentPatrolIndex + 1) % patrolPos.Length; // ループする
@@ -146,8 +225,6 @@ public class y_Enemy : MonoBehaviour, IEnemy
     // プレイヤーの判定
     bool CanSearchPlayer()
     {
-        if (player == null) return false;
-
         // プレイヤーとの距離の計算
         Vector3 directionToPlayer = player.position - transform.position;
         float distanceToPlayer = directionToPlayer.magnitude;
@@ -185,14 +262,22 @@ public class y_Enemy : MonoBehaviour, IEnemy
     // ダメージを受けた時の処理
     public void TakeDamage(int damage)
     {
+        if(isDead) return; // 死んでいる時は処理しない
+
         currentHP -= damage;
         if (currentHP < 0.0f)
         {
             currentHP = 0.0f; // 0以下にしない
-            isDead = true;
+            Die(); // 死んだ処理
         }
 
         Debug.Log("TakeDamageが呼ばれた!!");
+    }
+
+    // 死んだときの処理
+    void Die()
+    {
+        isDead = true;
     }
 
     // デバッグ可視化用
