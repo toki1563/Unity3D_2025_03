@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// プレイヤーの攻撃関係を管理するクラス
@@ -34,11 +35,10 @@ public class R_PlayerAttack : MonoBehaviour
 
 
 	Rigidbody _rb;
-	int _currentBulletCount;                    //現在の弾数
-	[SerializeField]float _bulletFireInterval = 0.2f;           //発射間隔
-	float _bulletIntervalCount = 0;				//現在の発射間隔タイマー
-	bool _canBullet = false;					//True：発射可能
-	bool _canReload = false;					//True：リロード可能
+	int _currentBulletCount;							//現在の弾数
+	float _bulletFireInterval = 0.2f;					//発射間隔
+	bool _canBullet = true;								//True：発射可能
+	bool _canReload = false;							//True：リロード可能
 
 	public bool _CanBullet { get => _canBullet;}
 	public bool _CanReload { get => _canReload;}
@@ -51,26 +51,32 @@ public class R_PlayerAttack : MonoBehaviour
 	}
 
 	private void Update()
-	{
-		//発射間隔を測る
-		if (!_canBullet && _currentBulletCount > 0) _bulletIntervalCount += R_PlayerManager.Instance._Time;
-
-		//発射間隔を越えたら発射可能
-		if (_bulletIntervalCount > _bulletFireInterval && _currentBulletCount > 0) _canBullet = true;
-
+	{		
 		//弾が０以下になったらリロード可能にする
 		if (_currentBulletCount <= 0) _canReload = true;
 	}
 
 
 	/// <summary>
-	/// プレイヤーの攻撃処理
-	/// スペースキーが押されたら実行
+	/// スペースキーが押されたとき
+	/// 発射可能なら攻撃処理実行
 	/// </summary>
-	public void _PlayerAttack()
+	public void _StartAttack()
 	{
-		R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.ATTACK;
+		if (!_canBullet && _currentBulletCount <= 0) return;
+
+		//発射間隔を越えたら発射可能
+		StartCoroutine(_PlayerAttack(_bulletFireInterval));
+	}
+
+
+	/// <summary>
+	/// プレイヤーの攻撃処理
+	/// </summary>
+	public IEnumerator _PlayerAttack(float _reloadInterval)
+	{
 		_currentBulletCount--;
+		_canBullet = false;
 
 		//弾生成
 		GameObject bulletObj = Instantiate(R_PlayerManager.Instance._BulletPrefab, R_PlayerManager.Instance._BulletShotTran.position,Quaternion.identity);
@@ -82,23 +88,39 @@ public class R_PlayerAttack : MonoBehaviour
 
 		Destroy(bulletObj, 1.0f);
 
+		//発射間隔を測る
+		yield return new WaitForSeconds(_reloadInterval);
 
 		//初期化
-		_canBullet = false;
-		_bulletIntervalCount = 0;
-		R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.DEFAULT;
+		_canBullet = true;
+		 R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.DEFAULT;
 	}
+
 
 	/// <summary>
 	/// プレイヤーのリロード処理
-	/// 弾が０以下でスペースキーを押したら実行
-	/// TODO：リロードに完了速度を追加する
+	/// 弾が０以下でRキーを押したら実行
+	/// <param name="_reloadInterval">リロード完了速度</param>
 	/// </summary>
-	public void _PlayerReload()
+	public void _StartReload(float _reloadInterval)
 	{
 		if (!_canReload) return;
+		StartCoroutine(_PlayerReload(_reloadInterval));
+	}
 
-		_currentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
+	/// <summary>
+	/// リロード完了速度中に他のアクションをしたら中断する（※未実装）
+	/// </summary>
+	/// <param name="_reloadInterval">リロード完了速度</param>
+	/// <returns></returns>
+	public IEnumerator _PlayerReload(float _reloadInterval)
+	{
+		//リロード完了速度
+		yield return new WaitForSeconds(_reloadInterval);
+
+		//初期化
 		_canReload = false;
+		_currentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
+		R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.DEFAULT;
 	}
 }
