@@ -1353,6 +1353,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 264343237}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1477563673 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2251118362777753093, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+  m_PrefabInstance: {fileID: 4482485328215468335}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1477563679
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1477563673}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4c2f2a372eff0ad4b938cec24c35d128, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1511111969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1927,6 +1953,38 @@ PrefabInstance:
       propertyPath: canGoalObjects.Array.data[0]
       value: 
       objectReference: {fileID: 1323365881}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1477563679}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Play
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.Animator, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: FadeOut
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: OnGoalAnimation.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4751983730413903494, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.84
@@ -1967,10 +2025,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4751983730413903494, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2251118362777753093, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1477563679}
   m_SourcePrefab: {fileID: 100100000, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
