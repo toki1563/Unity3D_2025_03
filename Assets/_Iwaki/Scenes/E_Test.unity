@@ -660,6 +660,111 @@ Transform:
   m_Children: []
   m_Father: {fileID: 264343237}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &634366016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 634366017}
+  - component: {fileID: 634366018}
+  m_Layer: 0
+  m_Name: GameStateEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &634366017
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634366016}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1176092532}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &634366018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634366016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf96d493d8e08c40b7d74962ef486f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onGameStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onGameOver:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1547906606}
+        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+        m_MethodName: Play
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: TimerFadeOut
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2086136021}
+        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+        m_MethodName: Play
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: HealthFadeOut
+          m_BoolArgument: 0
+        m_CallState: 2
+  onStageClear:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1547906606}
+        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+        m_MethodName: Play
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: TimerFadeOut
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2086136021}
+        m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+        m_MethodName: Play
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: HealthFadeOut
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &704978626 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 664833960230268400, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
@@ -1000,6 +1105,11 @@ MonoBehaviour:
   m_YawDamping: 0
   m_RollDamping: 0
   m_AngularDamping: 0
+--- !u!224 &1176092532 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6065049831149501496, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+  m_PrefabInstance: {fileID: 2086136017}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1244638940
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1054,11 +1164,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4891713996331231914, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: timeLimit
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7633697602495406044, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1473,6 +1583,11 @@ MonoBehaviour:
   m_BoundingShape2D: {fileID: 0}
   m_ConfineScreenEdges: 1
   m_Damping: 0
+--- !u!95 &1547906606 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8390707964669901344, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+  m_PrefabInstance: {fileID: 2086136017}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1701076320
 GameObject:
   m_ObjectHideFlags: 0
@@ -2028,13 +2143,46 @@ PrefabInstance:
       propertyPath: m_FillMethod
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6433421199407809937, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
     m_RemovedGameObjects:
     - {fileID: 2497392352603076410, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
     - {fileID: 2250388732703351726, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 6065049831149501496, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 634366017}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9174961439161614688, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2086136021}
   m_SourcePrefab: {fileID: 100100000, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+--- !u!1 &2086136019 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9174961439161614688, guid: 6c9951d4c46df6e43837f6a2362bb094, type: 3}
+  m_PrefabInstance: {fileID: 2086136017}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2086136021
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2086136019}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e45f688c081efb84e9a3ceec9ab7dc93, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &4482485328215468335
 PrefabInstance:
   m_ObjectHideFlags: 0
