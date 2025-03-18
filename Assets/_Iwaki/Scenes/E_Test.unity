@@ -1919,6 +1919,14 @@ PrefabInstance:
       propertyPath: controller
       value: 
       objectReference: {fileID: 1244638941}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: canGoalObjects.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3564752919594850466, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
+      propertyPath: canGoalObjects.Array.data[0]
+      value: 
+      objectReference: {fileID: 1323365881}
     - target: {fileID: 4751983730413903494, guid: 87040f87196482d48b93bdc60ff969eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.84

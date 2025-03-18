@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -7,6 +8,7 @@ using UnityEngine.Events;
 public class Goal : MonoBehaviour
 {
     [SerializeField] GameStateController controller;
+    [SerializeField] List<Transform> canGoalObjects;
     [SerializeField] UnityEvent OnGoalAnimation;
 
     private void Reset()
@@ -19,13 +21,19 @@ public class Goal : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        OnGoalAnimation.Invoke();
-        controller.StageClear();
+        if (canGoalObjects.Contains(collision.transform))
+        {
+            OnGoalAnimation.Invoke();
+            controller.StageClear();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        OnGoalAnimation.Invoke();
-        controller.StageClear();
+        if (canGoalObjects.Contains(other.transform))
+        {
+            OnGoalAnimation.Invoke();
+            controller.StageClear();
+        }
     }
 }
