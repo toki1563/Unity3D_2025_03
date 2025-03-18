@@ -6,8 +6,8 @@ using UnityEngine.UI;
 /// </summary>
 public class HPBarUI : MonoBehaviour
 {
-    [SerializeField] Slider health;
-    [SerializeField] Slider damage;
+    [SerializeField] Image health;
+    [SerializeField] Image damage;
     [SerializeField] float timeToStartDecreaseDamageBar = 1;
     [SerializeField] float damageBarDecreaseDuration = 1;
  
@@ -21,8 +21,8 @@ public class HPBarUI : MonoBehaviour
         playerManager = R_PlayerManager.Instance;
         prevHP = playerManager._MaxHP;
 
-        health.value = 1;
-        damage.value = 1;
+        health.fillAmount = 1;
+        damage.fillAmount = 1;
     }
 
     private void Update()
@@ -36,13 +36,13 @@ public class HPBarUI : MonoBehaviour
 
         if (prevDamagedTime + timeToStartDecreaseDamageBar < Time.time)
         {
-            damage.value = Mathf.MoveTowards(damage.value, targetRatio, damageBarDecreaseDuration * Time.deltaTime);
+            damage.fillAmount = Mathf.MoveTowards(damage.fillAmount, targetRatio, damageBarDecreaseDuration * Time.deltaTime);
         }
     }
 
     private void UpdateView()
     {
         targetRatio = playerManager._CurrentHP / playerManager._MaxHP;
-        health.value = targetRatio;
+        health.fillAmount = targetRatio;
     }
 }
