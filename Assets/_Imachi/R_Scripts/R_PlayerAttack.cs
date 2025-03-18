@@ -35,11 +35,11 @@ public class R_PlayerAttack : MonoBehaviour
 
 
 	Rigidbody _rb;
-	[SerializeField]int _currentBulletCount;							//現在の弾数
+	int _currentBulletCount;							//現在の弾数
 	float _bulletFireInterval = 0.2f;                   //発射間隔
 	bool _canBullet = true;								//True：発射可能
 	bool _canReload = false;                            //True：リロード移行
-	[SerializeField]bool _isBulletReload = false;						//Trueリロード中
+	bool _isBulletReload = false;						//Trueリロード中
 
 	public bool _CanBullet { get => _canBullet;}
 	public bool _CanReload { get => _canReload;}
