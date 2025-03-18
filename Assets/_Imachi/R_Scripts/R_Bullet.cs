@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class R_Bullet : MonoBehaviour
 {
-    [SerializeField]
+    [SerializeField,Header("弾の攻撃力")]
     int damage = 1;
 
     // 敵に当たった時

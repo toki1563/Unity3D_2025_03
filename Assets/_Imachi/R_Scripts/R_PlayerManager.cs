@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// プレイヤー全体を管理するクラス
 /// </summary>
-public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageClearSender
+public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageClearSender ,IGameStartSender
 {
 	#region シングルトン
 	static R_PlayerManager instance;
@@ -49,26 +49,29 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 
 
 	[SerializeField] GameObject _bulletPrefab;
-	[SerializeField] Transform _bulletShotTran;
+	[SerializeField] Transform _bulletShotTran;				//発射口
 
 	[Header("パラメータ")]
 	[SerializeField, Header("プレイヤーが移動する速度")] float _moveSpeed;
-	[SerializeField, Header("プレイヤーのHP")] float _maxHP;
+	[SerializeField, Header("プレイヤーの最大HP")] float _maxHP;
 	[SerializeField, Header("プレイヤーがリロードなしで発射できる最大弾数")] int _maxBulletCount;
 	[SerializeField, Header("プレイヤーの弾の速度")] float _bulletSpeed;
 
 
-	ACTION _actionType = ACTION.DEFAULT;					//行動タイプ
+	ACTION _actionType = ACTION.DEFAULT;                    //行動タイプ
+	Vector3 _playerDir;                                     //方向
 	Transform _transform;									//キャッシュ用
 	float _time;											//デルタタイム格納用
-	Vector3 _playerDir;                                     //方向
 	float _defence = 1.0f;									//防御率
-	bool _isDead = false;									//True:プレイヤーがしぬ
-	float _currentHP;
-	float _flashDamageTime = 0.1f;							//ダメージを受けたときの赤く光る時間
+	float _currentHP;										//現在の体力
+	float _flashDamageTime = 0.1f;                          //ダメージを受けたときの赤く光る時間
+	int _currentBulletCount;                                //現在の弾数
+	bool _isDead = false;                                   //True:プレイヤーがしぬ
+	bool _isGameStart = false;
 
 	public event Action SendGameOver;
 	public event Action SendStageClear;
+	public event Action SendGameStart;
 
 	public ACTION _ActionType { get => _actionType; set => _actionType = value; }
 	public Transform _Transform { get => _transform; set => _transform = value; }
@@ -78,8 +81,14 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 	public GameObject _BulletPrefab { get => _bulletPrefab;}
 	public Transform _BulletShotTran { get => _bulletShotTran;}
 	public float _BulletSpeed { get => _bulletSpeed; }
-	public int _MaxBulletCount { get => _maxBulletCount;}
 	public float _Defence { get => _defence; set => _defence = value; }
+
+
+	//UIで使用する
+	public float _CurrentHP { get => _currentHP;}
+	public float _MaxHP { get => _maxHP;}
+	public int _MaxBulletCount { get => _maxBulletCount; }
+	public int _CurrentBulletCount { get => _currentBulletCount; set => _currentBulletCount = value; }
 
 	#endregion
 
@@ -91,11 +100,15 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 		_time = Time.deltaTime;
 		_playerDir = Vector3.forward;
 		_currentHP = _maxHP;
+		_currentBulletCount = _maxBulletCount;
 	}
 
 
 	void Update()
 	{
+		//ゲームが始まるまでは実行しない
+		if (!_isGameStart) return;
+
 		//体力がなくなったらこれ以上処理しない
 		if (_isDead) return;
 
@@ -159,7 +172,6 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
     {
 		if (other.gameObject.CompareTag("Goal"))
 		{
-			Debug.Log("go-ru");
 			_GameClear();
 		}
 	}
@@ -196,6 +208,12 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 
 		//元の色に戻す
 		gameObject.GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	void _GameStartSet()
+	{
+		SendGameStart.Invoke();
+		_isGameStart = true;
 	}
 
 	/// <summary>
