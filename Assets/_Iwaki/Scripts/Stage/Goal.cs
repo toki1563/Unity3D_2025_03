@@ -8,20 +8,19 @@ using UnityEngine.Events;
 public class Goal : MonoBehaviour
 {
     [SerializeField] GameStateController controller;
-    [SerializeField] List<Transform> canGoalObjects;
     [SerializeField] UnityEvent OnGoalAnimation;
 
     private void Reset()
     {
-        if (FindAnyObjectByType<GameStateController>() is GameStateController c)
+        if (FindAnyObjectByType<GameStateController>() is GameStateController gameStateController)
         {
-            controller = c;
+            controller = gameStateController;
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (canGoalObjects.Contains(collision.transform))
+        if (collision.transform == R_PlayerManager.Instance.transform)
         {
             OnGoalAnimation.Invoke();
             controller.StageClear();
@@ -30,7 +29,7 @@ public class Goal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (canGoalObjects.Contains(other.transform))
+        if (other.transform == R_PlayerManager.Instance.transform)
         {
             OnGoalAnimation.Invoke();
             controller.StageClear();
