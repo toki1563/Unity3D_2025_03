@@ -52,7 +52,9 @@ public class GameStateController : MonoBehaviour
 
     public void GameOver()
     {
-        if (currentState != GameState.Playing) return;
+        if (currentState == GameState.GameOver) return;
+
+        if (currentState == GameState.WaitStart) print("ゲーム開始より前にゲームオーバーが呼び出されました");
 
         Debug.Log("GameOver");
         currentState = GameState.GameOver;
@@ -65,7 +67,9 @@ public class GameStateController : MonoBehaviour
 
     public void StageClear()
     {
-        if (currentState != GameState.Playing) return;
+        if (currentState == GameState.GameOver) return;
+
+        if (currentState == GameState.WaitStart) print("ゲーム開始より前にステージクリアが呼び出されました");
 
         Debug.Log("StageClear");
         currentState = GameState.StageClear;
