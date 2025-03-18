@@ -35,25 +35,21 @@ public class R_PlayerAttack : MonoBehaviour
 
 
 	Rigidbody _rb;
-	[SerializeField]int _currentBulletCount;							//現在の弾数
 	float _bulletFireInterval = 0.2f;                   //発射間隔
+	float _bulletDestroyTime = 1.0f;					//弾が発射されてから消える時間
 	bool _canBullet = true;								//True：発射可能
 	bool _canReload = false;                            //True：リロード移行
-	[SerializeField]bool _isBulletReload = false;						//Trueリロード中
+	bool _isBulletReload = false;						//Trueリロード中
 
 	public bool _CanBullet { get => _canBullet;}
 	public bool _CanReload { get => _canReload;}
 	public bool _IsBulletReload { get => _isBulletReload; set => _isBulletReload = value; }
 
-	private void Start()
-	{
-		_currentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
-	}
 
 	private void Update()
 	{		
 		//弾が０以下になったらリロードへ移行する
-		if (_currentBulletCount <= 0) _canReload = true;
+		if (R_PlayerManager.Instance._CurrentBulletCount <= 0) _canReload = true;
 	}
 
 
@@ -63,7 +59,7 @@ public class R_PlayerAttack : MonoBehaviour
 	/// </summary>
 	public void _StartAttack()
 	{
-		if (!_canBullet && _currentBulletCount <= 0) return;
+		if (!_canBullet && R_PlayerManager.Instance._CurrentBulletCount <= 0) return;
 
 		//発射間隔を越えたら発射可能
 		StartCoroutine(_PlayerAttack(_bulletFireInterval));
@@ -75,7 +71,7 @@ public class R_PlayerAttack : MonoBehaviour
 	/// </summary>
 	public IEnumerator _PlayerAttack(float _reloadInterval)
 	{
-		_currentBulletCount--;
+		R_PlayerManager.Instance._CurrentBulletCount--;
 		_canBullet = false;
 
 		//弾生成
@@ -86,7 +82,7 @@ public class R_PlayerAttack : MonoBehaviour
 		Vector3 bulletDir = R_PlayerManager.Instance._PlayerDir;
 		_rb.AddForce(bulletDir * R_PlayerManager.Instance._BulletSpeed, ForceMode.Impulse);
 
-		Destroy(bulletObj, 1.0f);
+		Destroy(bulletObj, _bulletDestroyTime);
 
 		//発射間隔を測る
 		yield return new WaitForSeconds(_reloadInterval);
@@ -129,7 +125,7 @@ public class R_PlayerAttack : MonoBehaviour
 
 		//リロード成功
 		_canReload = false;
-		_currentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
+		R_PlayerManager.Instance._CurrentBulletCount = R_PlayerManager.Instance._MaxBulletCount;
 		R_PlayerManager.Instance._ActionType = R_PlayerManager.ACTION.DEFAULT;
 		_isBulletReload = false;
 	}

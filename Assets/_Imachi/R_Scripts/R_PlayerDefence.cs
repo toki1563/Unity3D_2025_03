@@ -18,6 +18,7 @@ public class R_PlayerDefence : MonoBehaviour
 		}
 	}
 
+
 	public void Awake()
 	{
 		//インスタンスが既に存在していたら自身を消去する
@@ -31,10 +32,13 @@ public class R_PlayerDefence : MonoBehaviour
 
 
 	float _defencePower = 0.5f;
+	public float _DefencePower { get => _defencePower;}
 
 
-
-    public void _PlayerDefence()
+	/// <summary>
+	/// 左シフト押している間はダメージが50％軽減される
+	/// </summary>
+	public void _PlayerDefence()
     {
 		R_PlayerManager.Instance._Defence = _defencePower;
 	}
