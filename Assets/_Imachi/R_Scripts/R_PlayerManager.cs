@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// プレイヤー全体を管理するクラス
 /// </summary>
-public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageClearSender ,IGameStartSender
+public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameStateReceiver
 {
 	#region シングルトン
 	static R_PlayerManager instance;
@@ -66,12 +66,13 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 	float _currentHP;										//現在の体力
 	float _flashDamageTime = 0.1f;                          //ダメージを受けたときの赤く光る時間
 	int _currentBulletCount;                                //現在の弾数
-	bool _isDead = false;                                   //True:プレイヤーがしぬ
-	bool _isGameStart = false;
+	bool _isGameStart = false;								//True:プレイヤーの操作ができる　
+															//false:ゲーム開始前、ゲームオーバー時、ゲームクリア時
 
 	public event Action SendGameOver;
-	public event Action SendStageClear;
-	public event Action SendGameStart;
+	public Action OnGameStart => _GameStartSet;
+	public Action OnGameOver => _Die;
+	public Action OnStageClear => _GameClear;
 
 	public ACTION _ActionType { get => _actionType; set => _actionType = value; }
 	public Transform _Transform { get => _transform; set => _transform = value; }
@@ -108,9 +109,6 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 	{
 		//ゲームが始まるまでは実行しない
 		if (!_isGameStart) return;
-
-		//体力がなくなったらこれ以上処理しない
-		if (_isDead) return;
 
 		//移動
 		R_PlayerMove.Instance._PlayerMove();
@@ -168,13 +166,6 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 
 	}
 
-    private void OnTriggerEnter(Collider other)
-    {
-		if (other.gameObject.CompareTag("Goal"))
-		{
-			_GameClear();
-		}
-	}
 
 	/// <summary>
 	/// プレイヤーのダメージ処理
@@ -182,7 +173,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 	/// <param name="damage">敵の弾の攻撃力</param>
 	public void TakeDamage(int damage)
 	{
-		if (_isDead) return;
+		if (!_isGameStart) return;
 
 		//防御時はダメージ50％減
 		if (_actionType == ACTION.DEFENCE) _currentHP -= damage * R_PlayerDefence.Instance._DefencePower;
@@ -191,7 +182,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 		//プレイヤーを赤くする
 		StartCoroutine(_FlashRedDamegeColor(_flashDamageTime));
 
-		//死んだ処理
+		//体力が０以下になったら死んだ処理
 		if (_currentHP < 0.0f) _Die();
 	}
 
@@ -210,27 +201,31 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IStageCl
 		gameObject.GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
+	/// <summary>
+	/// プレイヤーを操作するフラグをセットする
+	/// </summary>
 	void _GameStartSet()
 	{
-		SendGameStart.Invoke();
 		_isGameStart = true;
 	}
 
 	/// <summary>
-	/// プレイヤーの体力が０以下になったらゲームオーバー
+	/// プレイヤーの体力が０以下になったらゲームオーバーを呼び出す
 	/// </summary>
 	void _Die()
 	{
-		_isDead = true;
+		if (!_isGameStart) return;
+		_isGameStart = false;
 		SendGameOver.Invoke();
 	}
 
 	/// <summary>
 	/// ゴールについたらゲームクリア
+	/// プレイヤーを操作できないようにフラグをセットする
 	/// </summary>
 	void _GameClear()
 	{
-		if (_isDead) return;
-		SendStageClear.Invoke();
+		if (!_isGameStart) return;
+        _isGameStart = false;
 	}
 }

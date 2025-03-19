@@ -123,6 +123,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &200498362 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8306428760076143690, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
+  m_PrefabInstance: {fileID: 1605907844}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4eed1cec04505044863476f60f53b1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &807350872
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,9 +252,10 @@ GameObject:
   - component: {fileID: 933194475}
   - component: {fileID: 933194474}
   - component: {fileID: 933194473}
+  - component: {fileID: 933194477}
   m_Layer: 0
   m_Name: Goal
-  m_TagString: Goal
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -334,6 +346,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &933194477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 933194472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 365c0147968996c4e91b34797e0c2b50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 200498362}
 --- !u!1001 &974663510
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -501,7 +526,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 861959445762919347, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3405241976226358010, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -545,7 +570,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4891713996331231914, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4891713996331231914, guid: 269e63632c4f63e469ba7b54ff636e1b, type: 3}
       propertyPath: timeLimit
@@ -672,7 +697,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1668143902822626847, guid: d8f286c0758cdaf4e95592494f46a0b3, type: 3}
       propertyPath: _maxHP
-      value: 100
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5141251604339537747, guid: d8f286c0758cdaf4e95592494f46a0b3, type: 3}
       propertyPath: m_LocalPosition.x
