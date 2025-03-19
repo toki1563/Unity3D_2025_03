@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class y_Enemy : MonoBehaviour, IDamage
+public class y_Enemy : MonoBehaviour, IDamage, IGameStateReceiver
 {
     [SerializeField, Header("最大体力値")]
     float maxHP = 2.0f;
@@ -50,7 +51,7 @@ public class y_Enemy : MonoBehaviour, IDamage
     float angleToPlayer = 0.0f; // プレイヤー向きの格納
     bool isDead = false;    // 死んだかどうか
     bool isChangingState = false; // 状態遷移中かどうか
-    NavMeshAgent agent; // ナビメッシュ
+	NavMeshAgent agent; // ナビメッシュ
     Coroutine fireCoroutine; // 射撃用コルーチン
     Coroutine waitCoroutine; // 停止時のコルーチン
     Vector3 targetPosition; // 移動する位置
@@ -58,9 +59,12 @@ public class y_Enemy : MonoBehaviour, IDamage
     Animator animator; // アニメーター
     Transform player; // プレイヤー取得
 
+	public Action OnGameStart => _GameStartSet;
+	public Action OnGameOver => _Die;
+	public Action OnStageClear => _GameClear;
 
 
-    enum Mode // 状態管理
+	enum Mode // 状態管理
     {
         SearchState, // 探索状態
         BattleState, // 戦闘状態
@@ -76,15 +80,16 @@ public class y_Enemy : MonoBehaviour, IDamage
         agent.speed = moveSpeed; // 移動速度の設定
         animator = GetComponent<Animator>();
         currentPatrolIndex = 0; // ここでインデックスを0に設定
-        MoveToNextPoint(); // 初めの移動ポイントへ
-        player = R_PlayerManager.Instance.transform; // プレイヤーの位置を取得
-    }
+		MoveToNextPoint(); // 初めの移動ポイントへ
+		player = R_PlayerManager.Instance.transform; // プレイヤーの位置を取得
+		agent.isStopped = true; // 移動停止
+	}
 
-    // 毎フレーム呼ばれる
-    void Update()
+	// 毎フレーム呼ばれる
+	void Update()
     {
         if (isDead) return; // 死んでいるなら処理しない
-        if (player == null) return; // プレイヤーがいないときは処理をやめる
+		if (player == null) return; // プレイヤーがいないときは処理をやめる
 
         // 現在のポイントに到達したら、停止して次のポイントへ移動
         if (!agent.pathPending && agent.remainingDistance <= stopDistance)
@@ -201,8 +206,8 @@ public class y_Enemy : MonoBehaviour, IDamage
     {
         if (isDead) return; // 死んでいるなら処理しない
 
-        // 自身から弾を生成
-        Instantiate(bulletPrefab, bullet.transform.position, transform.rotation);
+		// 自身から弾を生成
+		Instantiate(bulletPrefab, bullet.transform.position, transform.rotation);
         Debug.Log("敵が弾を発射");
     }
 
@@ -340,4 +345,21 @@ public class y_Enemy : MonoBehaviour, IDamage
             Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
         }
     }
+
+
+	void _GameStartSet()
+	{
+		agent.isStopped = false; // 移動開始
+	}
+
+	void _Die()
+    {
+		agent.isStopped = true; // 移動停止
+	}
+
+	void _GameClear()
+	{
+		agent.isStopped = true; // 移動停止
+	}
+
 }

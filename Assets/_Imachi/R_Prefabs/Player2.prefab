@@ -597,6 +597,7 @@ MonoBehaviour:
   _maxHP: 50
   _maxBulletCount: 10
   _bulletSpeed: 50
+  _player: {fileID: 5181975967988608313}
 --- !u!136 &4967912725082285068
 CapsuleCollider:
   m_ObjectHideFlags: 0

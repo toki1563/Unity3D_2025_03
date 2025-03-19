@@ -76,7 +76,7 @@ public class R_PlayerMove : MonoBehaviour
 	/// プレイヤーの移動処理
 	/// WASDキーが押されたら実行
 	/// </summary>
-	public void _PlayerMove()
+	public void _PlayerInput()
 	{
 
 		//何も入力が無い場合は方向・リスト初期化
@@ -89,16 +89,32 @@ public class R_PlayerMove : MonoBehaviour
 
 
 		//正面方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.W)) _pressedInput.Add(INPUT.W_KEY);
+		if (Input.GetKeyDown(KeyCode.W))
+		{
+			Debug.Log("W");
+			_pressedInput.Add(INPUT.W_KEY);
+		}
 
 		//後ろ方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.S)) _pressedInput.Add(INPUT.S_KEY);
+		if (Input.GetKeyDown(KeyCode.S))
+		{
+			Debug.Log("S");
+			_pressedInput.Add(INPUT.S_KEY);
+		}
 
 		//左方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.A)) _pressedInput.Add(INPUT.A_KEY);
+		if (Input.GetKeyDown(KeyCode.A))
+		{
+			Debug.Log("A");
+			_pressedInput.Add(INPUT.A_KEY);
+		}
 
 		//右方向のキーが押されたとき リストに追加
-		if (Input.GetKeyDown(KeyCode.D)) _pressedInput.Add(INPUT.D_KEY);
+		if (Input.GetKeyDown(KeyCode.D))
+		{
+			Debug.Log("D");
+			_pressedInput.Add(INPUT.D_KEY);
+		}
 
 
 
@@ -145,6 +161,10 @@ public class R_PlayerMove : MonoBehaviour
 		}
 
 
+	}
+
+	public void _PlayerMove()
+	{
 		//移動キーが押されていた場合
 		if (_moveDir != Vector3.zero)
 		{
@@ -160,5 +180,4 @@ public class R_PlayerMove : MonoBehaviour
 			R_PlayerManager.Instance._Anime.SetBool("isMove", true);
 		}
 	}
-
 }

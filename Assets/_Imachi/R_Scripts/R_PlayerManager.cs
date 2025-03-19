@@ -123,6 +123,8 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		//ゲームが始まるまでは実行しない
 		if (!_isGameStart) return;
 
+		R_PlayerMove.Instance._PlayerInput();
+
 		//攻撃
 		if (Input.GetKey(KeyCode.Space))
 		{
