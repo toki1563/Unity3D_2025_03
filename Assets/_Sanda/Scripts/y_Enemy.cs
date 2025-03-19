@@ -33,8 +33,6 @@ public class y_Enemy : MonoBehaviour, IDamage
     int fireRate = 3;
     [SerializeField, Header("弾のプレハブ")]
     GameObject bulletPrefab;
-    [SerializeField, Header("プレイヤーを格納")]
-    Transform player;
     [SerializeField, Header("弾の発射位置を格納")]
     Transform bullet;
     [SerializeField, Header("移動する場所を入れる")]
@@ -58,6 +56,8 @@ public class y_Enemy : MonoBehaviour, IDamage
     Vector3 targetPosition; // 移動する位置
     Mode stateMode = Mode.SearchState; // 状態格納
     Animator animator; // アニメーター
+    Transform player; // プレイヤー取得
+
 
 
     enum Mode // 状態管理
@@ -77,6 +77,7 @@ public class y_Enemy : MonoBehaviour, IDamage
         animator = GetComponent<Animator>();
         currentPatrolIndex = 0; // ここでインデックスを0に設定
         MoveToNextPoint(); // 初めの移動ポイントへ
+        player = R_PlayerManager.Instance.transform; // プレイヤーの位置を取得
     }
 
     // 毎フレーム呼ばれる
