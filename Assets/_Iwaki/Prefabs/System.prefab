@@ -81,7 +81,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableTimer: 0
-  timeLimit: 100
+  timeLimit: 1
+  timerText: {fileID: 0}
 --- !u!114 &155635970344881850
 MonoBehaviour:
   m_ObjectHideFlags: 0
