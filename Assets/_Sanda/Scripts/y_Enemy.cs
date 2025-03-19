@@ -1,12 +1,12 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class y_Enemy : MonoBehaviour, IDamage
 {
     [SerializeField, Header("最大体力値")]
-    float maxHP = 10.0f;
+    float maxHP = 2.0f;
     [SerializeField, Header("攻撃力")]
     float attack = 1.0f;
     [SerializeField, Header("移動速度")]
@@ -25,6 +25,8 @@ public class y_Enemy : MonoBehaviour, IDamage
     float battleModeTransTime = 1.0f;
     [SerializeField, Header("戦闘状態遷移時にターゲットの方向を向く速度")]
     float targetFollowSpeed = 2.0f;
+    [SerializeField, Header("敵の死亡までの時間")]
+    float enemyDestroyTime = 1.5f;
     [SerializeField, Header("各ポイントでの待機時間")]
     float[] waitTimes = {};
     [SerializeField, Header("1秒間で発射する数量")]
@@ -33,6 +35,8 @@ public class y_Enemy : MonoBehaviour, IDamage
     GameObject bulletPrefab;
     [SerializeField, Header("プレイヤーを格納")]
     Transform player;
+    [SerializeField, Header("弾の発射位置を格納")]
+    Transform bullet;
     [SerializeField, Header("移動する場所を入れる")]
     Transform[] patrolPos;
     [SerializeField, Header("無視する用の壁のレイヤーを入れる")]
@@ -53,7 +57,8 @@ public class y_Enemy : MonoBehaviour, IDamage
     Coroutine waitCoroutine; // 停止時のコルーチン
     Vector3 targetPosition; // 移動する位置
     Mode stateMode = Mode.SearchState; // 状態格納
-    Renderer rend;  // デバッグマテリアル表示用
+    Animator animator; // アニメーター
+
 
     enum Mode // 状態管理
     {
@@ -69,16 +74,15 @@ public class y_Enemy : MonoBehaviour, IDamage
         currentHP = maxHP;
         agent = GetComponent<NavMeshAgent>(); // ナビメッシュ取得
         agent.speed = moveSpeed; // 移動速度の設定
+        animator = GetComponent<Animator>();
         currentPatrolIndex = 0; // ここでインデックスを0に設定
         MoveToNextPoint(); // 初めの移動ポイントへ
-        rend = GetComponent<Renderer>();
-        rend.material.color = Color.blue; // 色を青に変更
     }
 
     // 毎フレーム呼ばれる
     void Update()
     {
-        if(isDead) return; // 死んでいるなら処理しない
+        if (isDead) return; // 死んでいるなら処理しない
         if (player == null) return; // プレイヤーがいないときは処理をやめる
 
         // 現在のポイントに到達したら、停止して次のポイントへ移動
@@ -87,6 +91,8 @@ public class y_Enemy : MonoBehaviour, IDamage
             waitCoroutine = StartCoroutine(WaitPoint()); // 開始時の探索処理
         }
 
+        // 移動しているときに移動アニメーション
+        animator.SetFloat("MoveSpeed", agent.velocity.magnitude);
 
         switch (stateMode)
         {
@@ -100,7 +106,6 @@ public class y_Enemy : MonoBehaviour, IDamage
                 {
                     MoveToNextPoint(); // 次のポイントを設定する処理
                 }
-
 
                 // プレイヤーを索敵
                 if (CanSearchPlayer() && !isChangingState)
@@ -152,23 +157,27 @@ public class y_Enemy : MonoBehaviour, IDamage
         }
 
         isChangingState = true;
-        if (newMode == Mode.BattleState) // バトル状態時
-        {
-            // 探索状態に切り替わる時間
-            yield return new WaitForSeconds(battleModeTransTime);
-
-            fireCoroutine = StartCoroutine(FireCoroutine()); // 発射処理
-            rend.material.color = Color.red; // 色を青に変更
-        }
-        else if (newMode == Mode.SearchState) // 探索状態時
+        if (newMode == Mode.BattleState) // バトル状態の設定時
         {
             // 戦闘状態に切り替わる時間
+            yield return new WaitForSeconds(battleModeTransTime);
+
+            // 攻撃アニメ開始
+            animator.SetBool("Attack", true);
+
+            fireCoroutine = StartCoroutine(FireCoroutine()); // 発射処理
+        }
+        else if (newMode == Mode.SearchState) // 探索状態の設定時
+        {
+            // 攻撃アニメ終了
+            animator.SetBool("Attack", false);
+
+            // 探索状態に切り替わる時間
             yield return new WaitForSeconds(searchModeTransTime);
 
             agent.isStopped = false; // 移動開始
             currentPatrolIndex -= 1; // 探索復帰時にマイナスにする
             MoveToNextPoint(); // 開始時の探索処理
-            rend.material.color = Color.blue; // 色を青に変更
         }
         stateMode = newMode;
         isChangingState = false;
@@ -189,8 +198,10 @@ public class y_Enemy : MonoBehaviour, IDamage
     // 弾を撃つ処理
     void Fire()
     {
+        if (isDead) return; // 死んでいるなら処理しない
+
         // 自身から弾を生成
-        Instantiate(bulletPrefab, transform.position, transform.rotation);
+        Instantiate(bulletPrefab, bullet.transform.position, transform.rotation);
         Debug.Log("敵が弾を発射");
     }
 
@@ -264,11 +275,19 @@ public class y_Enemy : MonoBehaviour, IDamage
     {
         if(isDead) return; // 死んでいる時は処理しない
 
+        // ダメージ処理
         currentHP -= damage;
-        if (currentHP < 0.0f)
+        if (currentHP <= 0.0f)
         {
+            // モーショントリガー
+            animator.SetTrigger("Death");
             currentHP = 0.0f; // 0以下にしない
             Die(); // 死んだ処理
+        }
+        else
+        {
+            // モーショントリガー
+            animator.SetTrigger("TakeDamage");
         }
 
         Debug.Log("TakeDamageが呼ばれた!!");
@@ -277,7 +296,14 @@ public class y_Enemy : MonoBehaviour, IDamage
     // 死んだときの処理
     void Die()
     {
-        isDead = true;
+        isDead = true; // 死んだときのフラグ
+        Invoke("AfterDestroy", 1.0f);
+    }
+
+    // 削除
+    void AfterDestroy()
+    {
+        Destroy(gameObject);
     }
 
     // デバッグ可視化用
@@ -286,14 +312,14 @@ public class y_Enemy : MonoBehaviour, IDamage
         if (isSearchDebug)
         {
             // 索敵範囲
-            Gizmos.color = Color.yellow;
+            Gizmos.color = UnityEngine.Color.yellow;
             Gizmos.DrawWireSphere(transform.position, searchDistance);
 
             // 視野角の表示
             Vector3 leftBoundary = Quaternion.Euler(0, -searchOfView / 2, 0) * transform.forward * searchDistance;
             Vector3 rightBoundary = Quaternion.Euler(0, searchOfView / 2, 0) * transform.forward * searchDistance;
 
-            Gizmos.color = Color.green;
+            Gizmos.color = UnityEngine.Color.green;
             Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
             Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
         }
@@ -301,14 +327,14 @@ public class y_Enemy : MonoBehaviour, IDamage
         if (isButtleDebug)
         {
             // 索敵範囲
-            Gizmos.color = Color.blue;
+            Gizmos.color = UnityEngine.Color.blue;
             Gizmos.DrawWireSphere(transform.position, battleDistance);
 
             // 視野角の表示
             Vector3 leftBoundary = Quaternion.Euler(0, -battleOfView / 2, 0) * transform.forward * battleDistance;
             Vector3 rightBoundary = Quaternion.Euler(0, battleOfView / 2, 0) * transform.forward * battleDistance;
 
-            Gizmos.color = Color.red;
+            Gizmos.color = UnityEngine.Color.red;
             Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
             Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
         }
