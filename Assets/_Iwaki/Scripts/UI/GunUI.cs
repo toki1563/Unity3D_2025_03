@@ -19,6 +19,7 @@ public class GunUI : MonoBehaviour
 
         if (playerManager)
         {
+            playerManager.OnReload += Reload;
             max.text = playerManager._MaxBulletCount.ToString();
         }
 
