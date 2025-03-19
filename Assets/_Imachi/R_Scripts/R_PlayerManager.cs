@@ -73,6 +73,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 
 	public event Action SendGameOver;
 	public event Action<float> OnReload;
+	public event Action StopReload;
 	public Action OnGameStart => _GameStartSet;
 	public Action OnGameOver => _Die;
 	public Action OnStageClear => _GameClear;
@@ -139,13 +140,24 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		//リロード
 		if (Input.GetKeyDown(KeyCode.Space) && R_PlayerAttack.Instance._CanReload || Input.GetKeyDown(KeyCode.R))
 		{
-			if (R_PlayerAttack.Instance._CanReload)
+			//リロード中に再度押されたらキャンセル
+			if (R_PlayerAttack.Instance._IsBulletReload)
+			{
+				Debug.Log("リロードキャンセル");
+				R_PlayerAttack.Instance._IsBulletReload = false;
+				StopReload.Invoke();
+				_actionType = ACTION.DEFAULT;
+			}
+			else if (R_PlayerAttack.Instance._CanReload)
 			{
 				//弾数が０の場合
 				Debug.Log("残弾0でリロード");
 				_actionType = ACTION.RELOAD;
 				R_PlayerAttack.Instance._StartReload(2.0f);
-				OnReload?.Invoke(2.0f);
+				if (R_PlayerAttack.Instance._IsBulletReload)
+				{
+					OnReload?.Invoke(2.0f);
+				}
 			}
 			else
 			{
@@ -153,17 +165,15 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 				Debug.Log("リロード");
 				_actionType = ACTION.RELOAD;
 				R_PlayerAttack.Instance._StartReload(1.0f);
-				OnReload?.Invoke(1.0f);
+
+				if(R_PlayerAttack.Instance._IsBulletReload)
+				{
+					OnReload?.Invoke(1.0f);
+				}
+
 			}
 		}
-
-		////リロード中に再度押されたらキャンセル
-		//if (R_PlayerAttack.Instance._IsBulletReload && Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.R))
-		//{
-		//	R_PlayerAttack.Instance._IsBulletReload = false;
-		//	//_actionType = ACTION.DEFAULT;
-		//}
-
+		
 
 		//防御
 		if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -247,4 +257,6 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		if (!_isGameStart) return;
         _isGameStart = false;
 	}
+
+
 }

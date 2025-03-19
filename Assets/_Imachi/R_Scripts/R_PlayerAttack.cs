@@ -42,7 +42,7 @@ public class R_PlayerAttack : MonoBehaviour
 	bool _isBulletReload = false;						//Trueリロード中
 
 	public bool _CanBullet { get => _canBullet;}
-	public bool _CanReload { get => _canReload;}
+	public bool _CanReload { get => _canReload; set => _canReload = value; }
 	public bool _IsBulletReload { get => _isBulletReload; set => _isBulletReload = value; }
 
 
@@ -119,7 +119,7 @@ public class R_PlayerAttack : MonoBehaviour
 			//キャンセルされたら終了
 			if (!_isBulletReload) yield break;
 
-			reloadTimer += R_PlayerManager.Instance._Time;
+			reloadTimer += Time.deltaTime;
 			yield return null;
 		}
 
