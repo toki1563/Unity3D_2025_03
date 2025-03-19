@@ -359,6 +359,7 @@ public class y_Enemy : MonoBehaviour, IDamage, IGameStateReceiver
 
 	void _GameClear()
 	{
+        if(isDead) return; // 死んでたら処理しない
 		agent.isStopped = true; // 移動停止
 	}
 
