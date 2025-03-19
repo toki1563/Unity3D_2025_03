@@ -9,7 +9,6 @@ public class GameTimer : MonoBehaviour, IGameOverSender, IGameStateReceiver
 {
     [SerializeField] bool enableTimer;
     [SerializeField, Header("制限時間(秒)")] float timeLimit = 180;
-    [SerializeField] Text timerText;
 
     float currentTimer;
 
