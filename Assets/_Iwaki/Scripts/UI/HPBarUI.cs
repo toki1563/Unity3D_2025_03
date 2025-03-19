@@ -19,7 +19,7 @@ public class HPBarUI : MonoBehaviour
     private void Start()
     {
         playerManager = R_PlayerManager.Instance;
-        prevHP = playerManager._MaxHP;
+        if (playerManager) prevHP = playerManager._MaxHP;
 
         health.fillAmount = 1;
         damage.fillAmount = 1;
@@ -27,7 +27,7 @@ public class HPBarUI : MonoBehaviour
 
     private void Update()
     {
-        if (playerManager._CurrentHP != prevHP)
+        if (playerManager && playerManager._CurrentHP != prevHP)
         {
             prevDamagedTime = Time.time;
             prevHP = playerManager._CurrentHP;
