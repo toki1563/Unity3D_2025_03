@@ -82,6 +82,7 @@ public class R_PlayerMove : MonoBehaviour
 		//何も入力が無い場合は方向・リスト初期化
 		if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
 		{
+			R_PlayerManager.Instance._Anime.SetBool("isMove",false);
 			_moveDir = Vector3.zero;
 			_pressedInput.Clear();
 		}
@@ -151,11 +152,12 @@ public class R_PlayerMove : MonoBehaviour
 			_moveDir = _moveDir.normalized;
 
 			//移動処理
-			R_PlayerManager.Instance._Transform.position += _moveDir * R_PlayerManager.Instance._MoveSpeed * _speedCompensation * R_PlayerManager.Instance._Time;
+			R_PlayerManager.Instance._Transform.position += _moveDir * R_PlayerManager.Instance._MoveSpeed * _speedCompensation * Time.fixedDeltaTime;
 
 			//移動方向に回転する
 			R_PlayerManager.Instance._Transform.rotation = Quaternion.LookRotation(_moveDir);
 			R_PlayerManager.Instance._PlayerDir = _moveDir;
+			R_PlayerManager.Instance._Anime.SetBool("isMove", true);
 		}
 	}
 

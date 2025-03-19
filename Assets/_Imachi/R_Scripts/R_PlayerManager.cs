@@ -66,8 +66,9 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 	float _currentHP;										//現在の体力
 	float _flashDamageTime = 0.1f;                          //ダメージを受けたときの赤く光る時間
 	int _currentBulletCount;                                //現在の弾数
-	bool _isGameStart = false;								//True:プレイヤーの操作ができる　
+	bool _isGameStart = false;                              //True:プレイヤーの操作ができる　
 															//false:ゲーム開始前、ゲームオーバー時、ゲームクリア時
+	Animator _anime;
 
 	public event Action SendGameOver;
 	public event Action<float> OnReload;
@@ -91,6 +92,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 	public float _MaxHP { get => _maxHP;}
 	public int _MaxBulletCount { get => _maxBulletCount; }
 	public int _CurrentBulletCount { get => _currentBulletCount; set => _currentBulletCount = value; }
+	public Animator _Anime { get => _anime; set => _anime = value; }
 
 	#endregion
 
@@ -98,27 +100,34 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 
 	void Start()
 	{
+		_currentHP = _maxHP;
 		_transform = transform;
 		_time = Time.deltaTime;
 		_playerDir = Vector3.forward;
-		_currentHP = _maxHP;
 		_currentBulletCount = _maxBulletCount;
+		_anime = GetComponent<Animator>();
 	}
 
+	void FixedUpdate()
+	{
+		//ゲームが始まるまでは実行しない
+		if (!_isGameStart) return;
+
+		//移動
+		R_PlayerMove.Instance._PlayerMove();
+	}
 
 	void Update()
 	{
 		//ゲームが始まるまでは実行しない
 		if (!_isGameStart) return;
 
-		//移動
-		R_PlayerMove.Instance._PlayerMove();//フィックスド
-
 		//攻撃
 		if (Input.GetKey(KeyCode.Space))
 		{
 			if (R_PlayerAttack.Instance._CanBullet && !R_PlayerAttack.Instance._CanReload)
 			{
+				_anime.SetTrigger("isShooter");
 				_actionType = ACTION.ATTACK;
 				R_PlayerAttack.Instance._StartAttack();
 			}
@@ -157,6 +166,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			_actionType = ACTION.DEFENCE;
+			_anime.SetBool("isDef",true);
 			R_PlayerAttack.Instance._IsBulletReload = false;
 			R_PlayerDefence.Instance._PlayerDefence();
 		}
@@ -164,6 +174,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		{
 			//離されたら通常に戻す
 			_actionType = ACTION.DEFAULT;
+			_anime.SetBool("isDef", false);
 			_defence = 1.0f;
 		}
 
@@ -184,6 +195,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 
 		//プレイヤーを赤くする
 		StartCoroutine(_FlashRedDamegeColor(_flashDamageTime));
+		_anime.SetTrigger("isDame");
 
 		//体力が０以下になったら死んだ処理
 		if (_currentHP < 0.0f) _Die();
@@ -219,6 +231,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 	{
 		if (!_isGameStart) return;
 		_isGameStart = false;
+		_anime.SetTrigger("isDeath");
 		SendGameOver.Invoke();
 	}
 
