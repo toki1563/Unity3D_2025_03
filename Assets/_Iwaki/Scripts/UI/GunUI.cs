@@ -12,6 +12,7 @@ public class GunUI : MonoBehaviour
     [SerializeField] Image reloadCircle;
 
     R_PlayerManager playerManager;
+    Coroutine reload;
 
     private void Start()
     {
@@ -20,6 +21,7 @@ public class GunUI : MonoBehaviour
         if (playerManager)
         {
             playerManager.OnReload += Reload;
+            playerManager.StopReload += StopReload;
             max.text = playerManager._MaxBulletCount.ToString();
         }
 
@@ -40,7 +42,7 @@ public class GunUI : MonoBehaviour
         var ratio = playerManager._CurrentBulletCount / playerManager._MaxBulletCount;
     }
 
-    private void Reload(float duration) => StartCoroutine(ReloadView(duration));
+    private void Reload(float duration) => reload = StartCoroutine(ReloadView(duration));
 
     private IEnumerator ReloadView(float duration)
     {
@@ -52,5 +54,11 @@ public class GunUI : MonoBehaviour
             elapse += Time.deltaTime;
             reloadCircle.fillAmount = 1 - elapse / duration;
         }
+    }
+
+    private void StopReload()
+    {
+        StopCoroutine(reload);
+        reloadCircle.fillAmount = 0;
     }
 }
