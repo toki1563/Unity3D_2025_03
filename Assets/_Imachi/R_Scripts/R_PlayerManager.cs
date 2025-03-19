@@ -69,6 +69,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 	bool _isGameStart = false;                              //True:プレイヤーの操作ができる　
 															//false:ゲーム開始前、ゲームオーバー時、ゲームクリア時
 	Animator _anime;
+	[SerializeField] GameObject _player;
 
 	public event Action SendGameOver;
 	public event Action<float> OnReload;
@@ -208,12 +209,12 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 	IEnumerator _FlashRedDamegeColor(float flashTime)
 	{
 		//色を赤くする
-		gameObject.GetComponent<Renderer>().material.color = new Color(1.0f, 0, 0, 1.0f);
+		_player.GetComponent<Renderer>().material.color = new Color(1.0f, 0, 0, 1.0f);
 
 		yield return new WaitForSeconds(flashTime);
 
 		//元の色に戻す
-		gameObject.GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+		_player.GetComponent<Renderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	/// <summary>
