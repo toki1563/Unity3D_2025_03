@@ -137,7 +137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a960d65f55d6a0541a54b89a291edd9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameTimer: {fileID: 0}
   timerFormat: mm':'ss'.'ff
   text: {fileID: 844784353029227153}
 --- !u!114 &844784353029227153
@@ -1160,7 +1159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameSceneManager: {fileID: 11400000, guid: 972fae10426669543bb86717ccf60c2b, type: 2}
-  transitionTime: 1
+  transitionTime: 0.5
 --- !u!1 &8401287006675764879
 GameObject:
   m_ObjectHideFlags: 0

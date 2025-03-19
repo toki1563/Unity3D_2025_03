@@ -14,18 +14,9 @@ public class GameStateController : MonoBehaviour
     {
         foreach (var obj in FindObjectsOfType<MonoBehaviour>())
         {
-            switch (obj)
-            {
-                case IGameStartSender s:
-                    s.SendGameStart += GameStart;
-                    break;
-                case IGameOverSender s:
-                    s.SendGameOver += GameOver;
-                    break;
-                case IStageClearSender s:
-                    s.SendStageClear += StageClear;
-                    break;
-            }
+            if (obj is IGameStartSender startSender) startSender.SendGameStart += GameStart;
+            if (obj is IGameOverSender gameOverSender) gameOverSender.SendGameOver += GameOver;
+            if (obj is IStageClearSender clearSender) clearSender.SendStageClear += StageClear;
         }
 
         foreach (var obj in FindObjectsOfType<MonoBehaviour>())
@@ -52,7 +43,9 @@ public class GameStateController : MonoBehaviour
 
     public void GameOver()
     {
-        if (currentState != GameState.Playing) return;
+        if (currentState == GameState.GameOver) return;
+
+        if (currentState == GameState.WaitStart) print("ゲーム開始より前にゲームオーバーが呼び出されました");
 
         Debug.Log("GameOver");
         currentState = GameState.GameOver;
@@ -65,7 +58,9 @@ public class GameStateController : MonoBehaviour
 
     public void StageClear()
     {
-        if (currentState != GameState.Playing) return;
+        if (currentState == GameState.GameOver) return;
+
+        if (currentState == GameState.WaitStart) print("ゲーム開始より前にステージクリアが呼び出されました");
 
         Debug.Log("StageClear");
         currentState = GameState.StageClear;
