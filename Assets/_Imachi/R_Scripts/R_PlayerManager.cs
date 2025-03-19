@@ -231,17 +231,4 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		if (!_isGameStart) return;
         _isGameStart = false;
 	}
-
-
-
-	void _ReloadTimer(float _interval)
-	{
-		float currentInterval = 0.0f;
-
-		while(currentInterval < _interval)
-		{
-			currentInterval += _time;
-			Debug.Log(currentInterval);
-		}
-	}
 }
