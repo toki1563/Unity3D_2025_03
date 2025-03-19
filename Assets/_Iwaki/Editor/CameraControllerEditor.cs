@@ -24,7 +24,18 @@ public class CameraControllerEditor : Editor
         {
             var cameraController = target as CameraController;
 
+            var cams = cameraController.GetTarget();
+            foreach (var cam in cams)
+            {
+                Undo.RecordObject(cam, "a");
+            }
+
             cameraController.SetTarget(transform);
+
+            foreach (var cam in cams)
+            {
+                EditorUtility.SetDirty(cam);
+            }
         }
     }
 }

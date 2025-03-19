@@ -1,4 +1,5 @@
 using Cinemachine;
+using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using System;
 using UnityEngine;
 
@@ -7,10 +8,10 @@ using UnityEngine;
 /// </summary>
 public class CameraController : MonoBehaviour, IGameStateReceiver
 {
-    [SerializeField] CinemachineVirtualCamera stageInCam;
-    [SerializeField] CinemachineVirtualCamera playingCam;
-    [SerializeField] CinemachineVirtualCamera gameOverCam;
-    [SerializeField] CinemachineVirtualCamera stageClearCam;
+    [SerializeField] CinemachineVirtualCameraBase stageInCam;
+    [SerializeField] CinemachineVirtualCameraBase playingCam;
+    [SerializeField] CinemachineVirtualCameraBase gameOverCam;
+    [SerializeField] CinemachineVirtualCameraBase stageClearCam;
 
     public Action OnGameStart => () => playingCam.MoveToTopOfPrioritySubqueue();
     public Action OnGameOver => () => gameOverCam.MoveToTopOfPrioritySubqueue();
@@ -32,7 +33,7 @@ public class CameraController : MonoBehaviour, IGameStateReceiver
 
     public void SetTarget(Transform transform)
     {
-        var cams = new[] { stageInCam, playingCam, gameOverCam, stageClearCam };
+        var cams = GetTarget();
 
         for (int i = 0; i < cams.Length; i++)
         {
@@ -41,5 +42,10 @@ public class CameraController : MonoBehaviour, IGameStateReceiver
         }
 
         Debug.Log($"SetTarget {transform.name}.transform");
+    }
+
+    public CinemachineVirtualCameraBase[] GetTarget()
+    {
+        return new[] { stageInCam, playingCam, gameOverCam, stageClearCam };
     }
 }
