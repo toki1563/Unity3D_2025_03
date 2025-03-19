@@ -70,6 +70,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 															//false:ゲーム開始前、ゲームオーバー時、ゲームクリア時
 
 	public event Action SendGameOver;
+	public event Action<float> OnReload;
 	public Action OnGameStart => _GameStartSet;
 	public Action OnGameOver => _Die;
 	public Action OnStageClear => _GameClear;
@@ -111,7 +112,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 		if (!_isGameStart) return;
 
 		//移動
-		R_PlayerMove.Instance._PlayerMove();
+		R_PlayerMove.Instance._PlayerMove();//フィックスド
 
 		//攻撃
 		if (Input.GetKey(KeyCode.Space))
@@ -132,6 +133,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 				Debug.Log("残弾0でリロード");
 				_actionType = ACTION.RELOAD;
 				R_PlayerAttack.Instance._StartReload(2.0f);
+				OnReload?.Invoke(2.0f);
 			}
 			else
 			{
@@ -139,6 +141,7 @@ public class R_PlayerManager : MonoBehaviour, IDamage, IGameOverSender, IGameSta
 				Debug.Log("リロード");
 				_actionType = ACTION.RELOAD;
 				R_PlayerAttack.Instance._StartReload(1.0f);
+				OnReload?.Invoke(1.0f);
 			}
 		}
 
