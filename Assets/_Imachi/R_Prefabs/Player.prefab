@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 1668143902822626847}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -162,7 +162,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c11cf7b27f6f644fa27e78a29920b90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentBulletCount: 0
 --- !u!114 &1486320324331589242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,11 +189,9 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 7476430319140220892, guid: 1c4c9dbb58d72e64b8875b1567f2df38, type: 3}
   _bulletShotTran: {fileID: 6789734434106419112}
   _moveSpeed: 2
-  _HP: 100
+  _maxHP: 0.5
   _maxBulletCount: 10
   _bulletSpeed: 50
-  _bulletReloadSpeed: 1
-  _actionType: 3
 --- !u!1 &1512734794922549763
 GameObject:
   m_ObjectHideFlags: 0
